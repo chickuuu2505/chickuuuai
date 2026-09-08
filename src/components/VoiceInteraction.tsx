@@ -47,7 +47,7 @@ export default function VoiceInteraction() {
     }
     setTimeout(() => {
       setPhase('idle')
-    }, 1550)
+    }, 500)
   }, [])
 
   const handlePressStart = (e: React.PointerEvent) => {
@@ -95,8 +95,8 @@ export default function VoiceInteraction() {
         <div
           className="fixed inset-0 pointer-events-none z-40 overflow-hidden"
           style={{
-            opacity: isActive ? 1 : 0,
-            transition: 'opacity 0.25s ease',
+            opacity: isCollapsing ? 0 : 1,
+            transition: isCollapsing ? 'opacity 0.5s ease' : 'opacity 0.25s ease',
           }}
         >
           <div
@@ -111,10 +111,10 @@ export default function VoiceInteraction() {
               borderRadius: isExpanded || isCollapsing ? '48% 48% 0 0 / 26% 26% 0 0' : '50% 50% 0 0 / 32% 32% 0 0',
               background: `radial-gradient(
                 ellipse 85% 75% at 50% 100%,
-                rgba(255, 255, 255, 0.35) 0%,
-                rgba(255, 255, 255, 0.18) 30%,
-                rgba(255, 255, 255, 0.08) 55%,
-                rgba(255, 255, 255, 0.03) 75%,
+                rgba(255, 255, 255, 0.25) 0%,
+                rgba(255, 255, 255, 0.12) 30%,
+                rgba(255, 255, 255, 0.05) 55%,
+                rgba(255, 255, 255, 0.02) 75%,
                 transparent 100%
               )`,
               backdropFilter: 'blur(40px) saturate(140%)',
@@ -122,7 +122,9 @@ export default function VoiceInteraction() {
               WebkitMaskImage: 'linear-gradient(to top, #000 0%, #000 55%, rgba(0,0,0,0.6) 75%, rgba(0,0,0,0.25) 88%, transparent 100%)',
               maskImage: 'linear-gradient(to top, #000 0%, #000 55%, rgba(0,0,0,0.6) 75%, rgba(0,0,0,0.25) 88%, transparent 100%)',
               willChange: 'height, opacity, transform',
-              transition: 'height 1.5s cubic-bezier(0.25, 0.1, 0.25, 1), border-radius 1.5s cubic-bezier(0.25, 0.1, 0.25, 1), opacity 1.5s cubic-bezier(0.25, 0.1, 0.25, 1)',
+              transition: isCollapsing 
+                ? 'height 0.5s cubic-bezier(0.4, 0, 1, 1), border-radius 0.5s cubic-bezier(0.4, 0, 1, 1), opacity 0.5s cubic-bezier(0.4, 0, 1, 1)'
+                : 'height 1.5s cubic-bezier(0.25, 0.1, 0.25, 1), border-radius 1.5s cubic-bezier(0.25, 0.1, 0.25, 1), opacity 1.5s cubic-bezier(0.25, 0.1, 0.25, 1)',
               opacity: isExpanded || isCollapsing ? 1 : 0,
               animation: isListening ? 'breathe 2.5s ease-in-out infinite' : 'none',
             }}
@@ -140,8 +142,8 @@ export default function VoiceInteraction() {
               borderRadius: isExpanded || isCollapsing ? '46% 46% 0 0 / 24% 24% 0 0' : '50% 50% 0 0 / 38% 38% 0 0',
               background: `radial-gradient(
                 ellipse 95% 85% at 50% 100%,
-                rgba(255, 255, 255, 0.18) 0%,
-                rgba(255, 255, 255, 0.07) 40%,
+                rgba(255, 255, 255, 0.12) 0%,
+                rgba(255, 255, 255, 0.04) 40%,
                 transparent 75%
               )`,
               backdropFilter: 'blur(28px) saturate(130%)',
@@ -149,7 +151,9 @@ export default function VoiceInteraction() {
               WebkitMaskImage: 'linear-gradient(to top, #000 0%, #000 50%, rgba(0,0,0,0.5) 72%, rgba(0,0,0,0.15) 88%, transparent 100%)',
               maskImage: 'linear-gradient(to top, #000 0%, #000 50%, rgba(0,0,0,0.5) 72%, rgba(0,0,0,0.15) 88%, transparent 100%)',
               willChange: 'height, opacity, transform',
-              transition: 'height 1.5s cubic-bezier(0.25, 0.1, 0.25, 1) 0.04s, opacity 1.5s cubic-bezier(0.25, 0.1, 0.25, 1) 0.04s',
+              transition: isCollapsing
+                ? 'height 0.5s cubic-bezier(0.4, 0, 1, 1) 0.02s, opacity 0.5s cubic-bezier(0.4, 0, 1, 1) 0.02s'
+                : 'height 1.5s cubic-bezier(0.25, 0.1, 0.25, 1) 0.04s, opacity 1.5s cubic-bezier(0.25, 0.1, 0.25, 1) 0.04s',
               opacity: isExpanded || isCollapsing ? 1 : 0,
               animation: isListening ? 'breathe2 2.5s ease-in-out infinite 0.1s' : 'none',
             }}

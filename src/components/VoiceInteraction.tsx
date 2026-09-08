@@ -8,7 +8,6 @@ export default function VoiceInteraction() {
   const [blurAmount, setBlurAmount] = useState(0)
   const [glowOpacity, setGlowOpacity] = useState(0)
 
-  // Prevent scrolling while holding
   useEffect(() => {
     if (phase !== 'idle' && phase !== 'collapsing') {
       document.body.style.overflow = 'hidden'
@@ -23,31 +22,25 @@ export default function VoiceInteraction() {
     }
   }, [phase])
 
-  // Expand animation
   const startExpansion = useCallback(() => {
     setPhase('expanding')
 
-    // Progressive blur
     setTimeout(() => setBlurAmount(15), 200)
     setTimeout(() => setBlurAmount(30), 500)
     setTimeout(() => setBlurAmount(40), 800)
 
-    // Glow fade in
     setTimeout(() => setGlowOpacity(0.5), 300)
     setTimeout(() => setGlowOpacity(1), 700)
 
-    // Enter listening state after expansion
     expandTimerRef.current = setTimeout(() => {
       setPhase('listening')
     }, 1500)
   }, [])
 
-  // Collapse animation
   const startCollapse = useCallback(() => {
     setPhase('collapsing')
     setGlowOpacity(0)
 
-    // Progressive blur reduction
     setTimeout(() => setBlurAmount(30), 100)
     setTimeout(() => setBlurAmount(15), 400)
     setTimeout(() => setBlurAmount(0), 700)
@@ -57,23 +50,20 @@ export default function VoiceInteraction() {
     }, 900)
   }, [])
 
-  // Handle press start
   const handlePressStart = (e: React.PointerEvent) => {
     e.preventDefault()
     e.stopPropagation()
-    
+
     if (phase !== 'idle') return
-    
+
     setPhase('pressing')
     setGlowOpacity(0.3)
 
-    // Begin expansion after initial press feedback
     pressTimerRef.current = setTimeout(() => {
       startExpansion()
     }, 180)
   }
 
-  // Handle press end
   const handlePressEnd = () => {
     if (pressTimerRef.current) {
       clearTimeout(pressTimerRef.current)
@@ -83,7 +73,6 @@ export default function VoiceInteraction() {
     }
 
     if (phase === 'pressing') {
-      // Quick tap - just reset
       setGlowOpacity(0)
       setPhase('idle')
     } else if (phase === 'expanding' || phase === 'listening') {
@@ -91,7 +80,6 @@ export default function VoiceInteraction() {
     }
   }
 
-  // Cleanup
   useEffect(() => {
     return () => {
       if (pressTimerRef.current) clearTimeout(pressTimerRef.current)
@@ -105,7 +93,6 @@ export default function VoiceInteraction() {
 
   return (
     <>
-      {/* Expanded liquid glass surface */}
       <AnimatePresence>
         {isActive && (
           <motion.div
@@ -139,7 +126,6 @@ export default function VoiceInteraction() {
               WebkitBackdropFilter: `blur(${blurAmount}px) saturate(180%) brightness(1.05)`,
             }}
           >
-            {/* Inner glass highlight - top edge */}
             <motion.div
               className="absolute inset-0 pointer-events-none"
               style={{
@@ -148,7 +134,6 @@ export default function VoiceInteraction() {
               }}
             />
 
-            {/* Side edge highlights */}
             <motion.div
               className="absolute inset-0 pointer-events-none"
               style={{
@@ -157,7 +142,6 @@ export default function VoiceInteraction() {
               }}
             />
 
-            {/* Inner shadow for depth */}
             <motion.div
               className="absolute inset-0 pointer-events-none"
               style={{
@@ -166,7 +150,6 @@ export default function VoiceInteraction() {
               }}
             />
 
-            {/* Breathing glow overlay */}
             {isListening && (
               <motion.div
                 className="absolute inset-0 pointer-events-none"
@@ -184,7 +167,6 @@ export default function VoiceInteraction() {
               />
             )}
 
-            {/* Subtle noise texture */}
             <div
               className="absolute inset-0 pointer-events-none opacity-[0.03]"
               style={{
@@ -192,7 +174,6 @@ export default function VoiceInteraction() {
               }}
             />
 
-            {/* Voice waveform visualization */}
             {isListening && (
               <motion.div
                 className="absolute top-[35%] left-1/2 -translate-x-1/2 flex items-center gap-[6px]"
@@ -222,7 +203,6 @@ export default function VoiceInteraction() {
               </motion.div>
             )}
 
-            {/* Status text */}
             {isListening && (
               <motion.div
                 className="absolute top-[48%] left-1/2 -translate-x-1/2 text-center"
@@ -235,7 +215,6 @@ export default function VoiceInteraction() {
               </motion.div>
             )}
 
-            {/* Cancel hint at bottom */}
             {isListening && (
               <motion.div
                 className="absolute bottom-[20%] left-1/2 -translate-x-1/2"
@@ -250,7 +229,6 @@ export default function VoiceInteraction() {
         )}
       </AnimatePresence>
 
-      {/* Microphone button */}
       <motion.button
         className="relative z-50 flex items-center justify-center select-none touch-none"
         style={{
@@ -281,7 +259,6 @@ export default function VoiceInteraction() {
         onPointerLeave={handlePressEnd}
         onPointerCancel={handlePressEnd}
       >
-        {/* Button inner glow */}
         <motion.div
           className="absolute inset-0 rounded-[inherit] pointer-events-none"
           style={{
@@ -290,7 +267,6 @@ export default function VoiceInteraction() {
           }}
         />
 
-        {/* Button shadow */}
         <motion.div
           className="absolute inset-0 rounded-[inherit] pointer-events-none -z-10"
           style={{
@@ -298,7 +274,6 @@ export default function VoiceInteraction() {
           }}
         />
 
-        {/* Microphone icon */}
         <motion.svg
           width="22"
           height="22"

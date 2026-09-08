@@ -299,7 +299,8 @@ function TrySomethingNewSection() {
 function BottomNav() {
   return (
     <div className="fixed bottom-0 left-0 right-0 z-50 safe-bottom">
-      <div className="flex items-end justify-between px-5 pb-4 pt-2">
+      <div className="bottom-nav-frost" />
+      <div className="relative flex items-end justify-between px-5 pb-4 pt-2">
         <button className="glass-button w-14 h-14 rounded-full flex items-center justify-center press-effect">
           <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
             <line x1="12" y1="4" x2="12" y2="20" stroke="#1d1d1f" strokeWidth="2" strokeLinecap="round" />

@@ -5,7 +5,6 @@
   --color-charcoal-light: #6e6e73;
 }
 
-/* System font stack for iOS-like typography */
 * {
   font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', 'Helvetica Neue', system-ui, sans-serif;
 }
@@ -25,7 +24,6 @@ html, body, #root {
   touch-action: pan-y;
 }
 
-/* Safe areas for iOS notch/home indicator */
 .safe-top {
   padding-top: env(safe-area-inset-top, 0px);
 }
@@ -34,7 +32,6 @@ html, body, #root {
   padding-bottom: env(safe-area-inset-bottom, 12px);
 }
 
-/* Glass morphism card */
 .glass-card {
   background: rgba(255, 255, 255, 0.7);
   backdrop-filter: blur(20px);
@@ -45,7 +42,6 @@ html, body, #root {
     0 1px 3px rgba(0, 0, 0, 0.02);
 }
 
-/* Glass morphism button */
 .glass-button {
   background: rgba(255, 255, 255, 0.75);
   backdrop-filter: blur(16px);
@@ -56,7 +52,6 @@ html, body, #root {
     0 1px 3px rgba(0, 0, 0, 0.02);
 }
 
-/* Microphone button */
 .mic-button {
   background: #1d1d1f;
   border: 3px solid rgba(255, 255, 255, 0.9);
@@ -65,7 +60,6 @@ html, body, #root {
     0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
-/* Press effect for interactive elements */
 .press-effect {
   transition: transform 0.15s ease, opacity 0.15s ease;
 }
@@ -75,7 +69,6 @@ html, body, #root {
   opacity: 0.8;
 }
 
-/* Card press effect */
 .card-press {
   transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
@@ -85,7 +78,6 @@ html, body, #root {
   box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
 }
 
-/* Hide scrollbar but allow scrolling */
 .hide-scrollbar {
   -ms-overflow-style: none;
   scrollbar-width: none;
@@ -95,14 +87,12 @@ html, body, #root {
   display: none;
 }
 
-/* Smooth scrolling */
 .smooth-scroll {
   -webkit-overflow-scrolling: touch;
   scroll-behavior: smooth;
   overscroll-behavior-x: contain;
 }
 
-/* Background gradient blobs */
 .bg-gradient-blob {
   position: absolute;
   border-radius: 50%;
@@ -110,13 +100,11 @@ html, body, #root {
   opacity: 0.8;
 }
 
-/* Fade at bottom for content behind nav */
 .fade-bottom {
   mask-image: linear-gradient(to bottom, black 70%, transparent 100%);
   -webkit-mask-image: linear-gradient(to bottom, black 70%, transparent 100%);
 }
 
-/* Line clamp utility */
 .line-clamp-4 {
   display: -webkit-box;
   -webkit-line-clamp: 4;
@@ -131,7 +119,6 @@ html, body, #root {
   overflow: hidden;
 }
 
-/* Animations */
 @keyframes fadeInUp {
   from {
     opacity: 0;
@@ -162,12 +149,10 @@ html, body, #root {
   opacity: 0;
 }
 
-/* Prevent pull-to-refresh on mobile */
 body {
   overscroll-behavior-y: contain;
 }
 
-/* Optimize for mobile rendering */
 .glass-card,
 .glass-button,
 .mic-button {
@@ -175,7 +160,6 @@ body {
   transform: translateZ(0);
 }
 
-/* Responsive adjustments for smaller phones */
 @media (max-height: 700px) {
   .glass-card {
     height: auto !important;
@@ -183,7 +167,6 @@ body {
   }
 }
 
-/* Ensure content is readable on all phone sizes */
 @media (max-width: 360px) {
   h1 {
     font-size: 26px !important;

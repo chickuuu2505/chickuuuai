@@ -1,7 +1,6 @@
-import { useState, useRef } from 'react'
+import { useRef } from 'react'
 import VoiceInteraction from './components/VoiceInteraction'
 
-// SVG Illustrations
 function ThinkingPersonIllustration() {
   return (
     <svg viewBox="0 0 110 110" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-full h-full">
@@ -74,7 +73,6 @@ function OdysseyIllustration() {
   )
 }
 
-// Top Navigation
 function TopNav() {
   return (
     <div className="flex items-center justify-between px-5 pt-3 pb-2">
@@ -101,7 +99,6 @@ function TopNav() {
   )
 }
 
-// Greeting Section
 function GreetingSection() {
   return (
     <div className="px-5 pt-4 pb-3 animate-fade-in-up">
@@ -119,7 +116,6 @@ function GreetingSection() {
   )
 }
 
-// Action Buttons
 function ActionButtons() {
   return (
     <div className="flex gap-3 px-5 mt-3 mb-6 animate-fade-in-up-delay-1">
@@ -133,7 +129,6 @@ function ActionButtons() {
   )
 }
 
-// Jump Back In Section
 function JumpBackInSection() {
   const scrollRef = useRef<HTMLDivElement>(null)
 
@@ -181,7 +176,6 @@ function JumpBackInSection() {
   )
 }
 
-// Recaps Section
 function RecapsSection() {
   const scrollRef = useRef<HTMLDivElement>(null)
 
@@ -236,7 +230,6 @@ function RecapsSection() {
   )
 }
 
-// Try Something New Section
 function TrySomethingNewSection() {
   const scrollRef = useRef<HTMLDivElement>(null)
 
@@ -303,7 +296,6 @@ function TrySomethingNewSection() {
   )
 }
 
-// Bottom Navigation
 function BottomNav() {
   return (
     <div className="fixed bottom-0 left-0 right-0 z-50 safe-bottom">
@@ -333,7 +325,6 @@ function BottomNav() {
   )
 }
 
-// Background Gradients
 function BackgroundGradients() {
   return (
     <div className="fixed inset-0 pointer-events-none z-0">
@@ -381,7 +372,6 @@ function BackgroundGradients() {
   )
 }
 
-// Main App
 function App() {
   const scrollRef = useRef<HTMLDivElement>(null)
 

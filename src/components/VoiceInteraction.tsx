@@ -1,14 +1,12 @@
-import { motion, AnimatePresence } from 'framer-motion'
 import { useState, useRef, useEffect, useCallback } from 'react'
 
 export default function VoiceInteraction() {
   const [phase, setPhase] = useState<'idle' | 'pressing' | 'expanding' | 'listening' | 'collapsing'>('idle')
   const pressTimerRef = useRef<ReturnType<typeof setTimeout>>()
   const expandTimerRef = useRef<ReturnType<typeof setTimeout>>()
-  const [blurAmount, setBlurAmount] = useState(0)
-  const [glowOpacity, setGlowOpacity] = useState(0)
+  const breatheTimerRef = useRef<ReturnType<typeof setTimeout>>()
+  const [particles, setParticles] = useState<Array<{ id: number; x: number; delay: number }>>([])
 
-  // Prevent scrolling while holding
   useEffect(() => {
     if (phase !== 'idle' && phase !== 'collapsing') {
       document.body.style.overflow = 'hidden'
@@ -23,298 +21,241 @@ export default function VoiceInteraction() {
     }
   }, [phase])
 
-  // Expand animation
+  const spawnParticles = useCallback(() => {
+    const newParticles = Array.from({ length: 7 }, (_, i) => ({
+      id: Date.now() + i,
+      x: (Math.random() - 0.5) * 120,
+      delay: Math.random() * 0.25,
+    }))
+    setParticles(newParticles)
+    setTimeout(() => setParticles([]), 1600)
+  }, [])
+
   const startExpansion = useCallback(() => {
     setPhase('expanding')
+    spawnParticles()
 
-    // Progressive blur
-    setTimeout(() => setBlurAmount(15), 200)
-    setTimeout(() => setBlurAmount(30), 500)
-    setTimeout(() => setBlurAmount(40), 800)
-
-    // Glow fade in
-    setTimeout(() => setGlowOpacity(0.5), 300)
-    setTimeout(() => setGlowOpacity(1), 700)
-
-    // Enter listening state after expansion
-    expandTimerRef.current = setTimeout(() => {
+    breatheTimerRef.current = setTimeout(() => {
       setPhase('listening')
     }, 1500)
-  }, [])
+  }, [spawnParticles])
 
-  // Collapse animation
   const startCollapse = useCallback(() => {
     setPhase('collapsing')
-    setGlowOpacity(0)
-
-    // Progressive blur reduction
-    setTimeout(() => setBlurAmount(30), 100)
-    setTimeout(() => setBlurAmount(15), 400)
-    setTimeout(() => setBlurAmount(0), 700)
-
+    if (breatheTimerRef.current) {
+      clearTimeout(breatheTimerRef.current)
+    }
     setTimeout(() => {
       setPhase('idle')
-    }, 900)
+    }, 1550)
   }, [])
 
-  // Handle press start
   const handlePressStart = (e: React.PointerEvent) => {
     e.preventDefault()
     e.stopPropagation()
-    
-    if (phase !== 'idle') return
-    
-    setPhase('pressing')
-    setGlowOpacity(0.3)
 
-    // Begin expansion after initial press feedback
+    if (phase !== 'idle') return
+
+    setPhase('pressing')
+
     pressTimerRef.current = setTimeout(() => {
       startExpansion()
-    }, 180)
+    }, 280)
   }
 
-  // Handle press end
   const handlePressEnd = () => {
     if (pressTimerRef.current) {
       clearTimeout(pressTimerRef.current)
     }
-    if (expandTimerRef.current) {
-      clearTimeout(expandTimerRef.current)
-    }
 
     if (phase === 'pressing') {
-      // Quick tap - just reset
-      setGlowOpacity(0)
       setPhase('idle')
     } else if (phase === 'expanding' || phase === 'listening') {
       startCollapse()
     }
   }
 
-  // Cleanup
   useEffect(() => {
     return () => {
       if (pressTimerRef.current) clearTimeout(pressTimerRef.current)
       if (expandTimerRef.current) clearTimeout(expandTimerRef.current)
+      if (breatheTimerRef.current) clearTimeout(breatheTimerRef.current)
     }
   }, [])
 
   const isActive = phase !== 'idle'
+  const isExpanded = phase === 'expanding' || phase === 'listening'
+  const isCollapsing = phase === 'collapsing'
   const isListening = phase === 'listening'
-  const isExpanded = phase === 'expanding' || phase === 'listening' || phase === 'collapsing'
+  const isPressing = phase === 'pressing'
 
   return (
     <>
-      {/* Expanded liquid glass surface */}
-      <AnimatePresence>
-        {isActive && (
-          <motion.div
-            className="fixed bottom-0 left-1/2 z-40 pointer-events-none overflow-hidden"
-            initial={{
-              height: '60px',
-              width: '140px',
-              borderRadius: '30px',
-            }}
-            animate={
-              isExpanded
-                ? {
-                    height: '55vh',
-                    width: '100vw',
-                    borderRadius: '0px',
-                  }
-                : {
-                    height: '60px',
-                    width: '140px',
-                    borderRadius: '30px',
-                  }
-            }
-            transition={{
-              duration: isExpanded ? 1.5 : 0.9,
-              ease: isExpanded ? [0.22, 1, 0.36, 1] : [0.32, 0.72, 0, 1],
-            }}
+      {isActive && (
+        <div
+          className="fixed inset-0 pointer-events-none z-40 overflow-hidden"
+          style={{
+            opacity: isActive ? 1 : 0,
+            transition: 'opacity 0.25s ease',
+          }}
+        >
+          <div
+            className="liquid-veil"
             style={{
-              x: '-50%',
-              background: 'linear-gradient(180deg, rgba(25, 25, 30, 0.7) 0%, rgba(20, 20, 25, 0.85) 40%, rgba(15, 15, 20, 0.92) 100%)',
-              backdropFilter: `blur(${blurAmount}px) saturate(180%) brightness(1.05)`,
-              WebkitBackdropFilter: `blur(${blurAmount}px) saturate(180%) brightness(1.05)`,
+              position: 'absolute',
+              left: '50%',
+              bottom: '0',
+              width: '180%',
+              height: isExpanded || isCollapsing ? '50%' : '0',
+              transform: 'translateX(-50%)',
+              borderRadius: isExpanded || isCollapsing ? '48% 48% 0 0 / 26% 26% 0 0' : '50% 50% 0 0 / 32% 32% 0 0',
+              background: `radial-gradient(
+                ellipse 85% 75% at 50% 100%,
+                rgba(255, 255, 255, 0.35) 0%,
+                rgba(255, 255, 255, 0.18) 30%,
+                rgba(255, 255, 255, 0.08) 55%,
+                rgba(255, 255, 255, 0.03) 75%,
+                transparent 100%
+              )`,
+              backdropFilter: 'blur(40px) saturate(140%)',
+              WebkitBackdropFilter: 'blur(40px) saturate(140%)',
+              WebkitMaskImage: 'linear-gradient(to top, #000 0%, #000 55%, rgba(0,0,0,0.6) 75%, rgba(0,0,0,0.25) 88%, transparent 100%)',
+              maskImage: 'linear-gradient(to top, #000 0%, #000 55%, rgba(0,0,0,0.6) 75%, rgba(0,0,0,0.25) 88%, transparent 100%)',
+              willChange: 'height, opacity, transform',
+              transition: 'height 1.5s cubic-bezier(0.25, 0.1, 0.25, 1), border-radius 1.5s cubic-bezier(0.25, 0.1, 0.25, 1), opacity 1.5s cubic-bezier(0.25, 0.1, 0.25, 1)',
+              opacity: isExpanded || isCollapsing ? 1 : 0,
+              animation: isListening ? 'breathe 2.5s ease-in-out infinite' : 'none',
             }}
-          >
-            {/* Inner glass highlight - top edge */}
-            <motion.div
-              className="absolute inset-0 pointer-events-none"
-              style={{
-                background: 'linear-gradient(180deg, rgba(255,255,255,0.12) 0%, rgba(255,255,255,0.03) 30%, transparent 60%)',
-                opacity: glowOpacity,
-              }}
-            />
+          />
 
-            {/* Side edge highlights */}
-            <motion.div
-              className="absolute inset-0 pointer-events-none"
-              style={{
-                background: 'linear-gradient(90deg, rgba(255,255,255,0.06) 0%, transparent 15%, transparent 85%, rgba(255,255,255,0.06) 100%)',
-                opacity: glowOpacity,
-              }}
-            />
+          <div
+            className="liquid-veil-2"
+            style={{
+              position: 'absolute',
+              left: '50%',
+              bottom: '0',
+              width: '220%',
+              height: isExpanded || isCollapsing ? '54%' : '0',
+              transform: 'translateX(-50%)',
+              borderRadius: isExpanded || isCollapsing ? '46% 46% 0 0 / 24% 24% 0 0' : '50% 50% 0 0 / 38% 38% 0 0',
+              background: `radial-gradient(
+                ellipse 95% 85% at 50% 100%,
+                rgba(255, 255, 255, 0.18) 0%,
+                rgba(255, 255, 255, 0.07) 40%,
+                transparent 75%
+              )`,
+              backdropFilter: 'blur(28px) saturate(130%)',
+              WebkitBackdropFilter: 'blur(28px) saturate(130%)',
+              WebkitMaskImage: 'linear-gradient(to top, #000 0%, #000 50%, rgba(0,0,0,0.5) 72%, rgba(0,0,0,0.15) 88%, transparent 100%)',
+              maskImage: 'linear-gradient(to top, #000 0%, #000 50%, rgba(0,0,0,0.5) 72%, rgba(0,0,0,0.15) 88%, transparent 100%)',
+              willChange: 'height, opacity, transform',
+              transition: 'height 1.5s cubic-bezier(0.25, 0.1, 0.25, 1) 0.04s, opacity 1.5s cubic-bezier(0.25, 0.1, 0.25, 1) 0.04s',
+              opacity: isExpanded || isCollapsing ? 1 : 0,
+              animation: isListening ? 'breathe2 2.5s ease-in-out infinite 0.1s' : 'none',
+            }}
+          />
 
-            {/* Inner shadow for depth */}
-            <motion.div
-              className="absolute inset-0 pointer-events-none"
-              style={{
-                boxShadow: 'inset 0 1px 1px rgba(255,255,255,0.15), inset 0 -2px 4px rgba(0,0,0,0.3), inset 2px 0 4px rgba(0,0,0,0.1), inset -2px 0 4px rgba(0,0,0,0.1)',
-                opacity: glowOpacity,
-              }}
-            />
-
-            {/* Breathing glow overlay */}
-            {isListening && (
-              <motion.div
-                className="absolute inset-0 pointer-events-none"
-                animate={{
-                  opacity: [0, 0.15, 0],
-                }}
-                transition={{
-                  duration: 3,
-                  repeat: Infinity,
-                  ease: 'easeInOut',
-                }}
-                style={{
-                  background: 'radial-gradient(ellipse at center 40%, rgba(255,255,255,0.1) 0%, transparent 70%)',
-                }}
-              />
-            )}
-
-            {/* Subtle noise texture */}
+          {particles.map((p) => (
             <div
-              className="absolute inset-0 pointer-events-none opacity-[0.03]"
+              key={p.id}
+              className="particle"
               style={{
-                backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E")`,
+                position: 'absolute',
+                width: '5px',
+                height: '5px',
+                borderRadius: '50%',
+                background: 'rgba(255, 255, 255, 0.6)',
+                boxShadow: '0 0 12px rgba(255, 255, 255, 0.4)',
+                pointerEvents: 'none',
+                bottom: '52px',
+                left: '50%',
+                animation: `rise 1.35s cubic-bezier(0.16, 1, 0.3, 1) ${p.delay}s forwards`,
+                ['--x' as string]: `${p.x}px`,
               }}
             />
+          ))}
 
-            {/* Voice waveform visualization */}
-            {isListening && (
-              <motion.div
-                className="absolute top-[35%] left-1/2 -translate-x-1/2 flex items-center gap-[6px]"
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.3, duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
-              >
-                {[...Array(7)].map((_, i) => (
-                  <motion.div
-                    key={i}
-                    className="rounded-full"
-                    style={{
-                      width: '3px',
-                      background: 'rgba(255,255,255,0.7)',
-                    }}
-                    animate={{
-                      height: ['12px', `${20 + Math.random() * 25}px`, '12px'],
-                    }}
-                    transition={{
-                      duration: 0.8 + Math.random() * 0.4,
-                      repeat: Infinity,
-                      delay: i * 0.1,
-                      ease: 'easeInOut',
-                    }}
-                  />
-                ))}
-              </motion.div>
-            )}
+          {isListening && (
+            <div
+              style={{
+                position: 'absolute',
+                top: '35%',
+                left: '50%',
+                transform: 'translateX(-50%)',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '6px',
+                animation: 'fadeIn 0.5s ease forwards',
+              }}
+            >
+              {[12, 28, 18, 35, 22, 30, 15].map((maxHeight, i) => (
+                <div
+                  key={i}
+                  style={{
+                    width: '3px',
+                    borderRadius: '999px',
+                    background: 'rgba(255,255,255,0.7)',
+                    animation: `waveBar 0.8s ease-in-out ${i * 0.1}s infinite alternate`,
+                    height: '12px',
+                  }}
+                />
+              ))}
+            </div>
+          )}
 
-            {/* Status text */}
-            {isListening && (
-              <motion.div
-                className="absolute top-[48%] left-1/2 -translate-x-1/2 text-center"
-                initial={{ opacity: 0, y: 15 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.5, duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
-              >
-                <p className="text-white/90 text-[17px] font-medium tracking-[-0.01em] mb-1.5">Listening...</p>
-                <p className="text-white/40 text-[13px] font-normal">Release to send</p>
-              </motion.div>
-            )}
+          {isListening && (
+            <div
+              style={{
+                position: 'absolute',
+                top: '48%',
+                left: '50%',
+                transform: 'translateX(-50%)',
+                textAlign: 'center',
+                animation: 'fadeIn 0.6s ease 0.3s forwards',
+                opacity: 0,
+              }}
+            >
+              <p style={{ color: 'rgba(255,255,255,0.9)', fontSize: '17px', fontWeight: 500, letterSpacing: '-0.01em', marginBottom: '6px' }}>
+                Listening...
+              </p>
+              <p style={{ color: 'rgba(255,255,255,0.5)', fontSize: '13px', fontWeight: 400 }}>
+                Release to send
+              </p>
+            </div>
+          )}
+        </div>
+      )}
 
-            {/* Cancel hint at bottom */}
-            {isListening && (
-              <motion.div
-                className="absolute bottom-[20%] left-1/2 -translate-x-1/2"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ delay: 1, duration: 0.5 }}
-              >
-                <p className="text-white/25 text-[11px] font-normal">Slide up to cancel</p>
-              </motion.div>
-            )}
-          </motion.div>
-        )}
-      </AnimatePresence>
-
-      {/* Microphone button */}
-      <motion.button
+      <button
         className="relative z-50 flex items-center justify-center select-none touch-none"
         style={{
           width: '140px',
           height: '60px',
           borderRadius: '30px',
-          background: phase === 'pressing'
-            ? 'linear-gradient(135deg, rgba(50, 50, 55, 0.95) 0%, rgba(35, 35, 40, 0.95) 100%)'
-            : 'linear-gradient(135deg, rgba(35, 35, 40, 0.92) 0%, rgba(25, 25, 30, 0.92) 100%)',
-          backdropFilter: 'blur(20px) saturate(180%)',
-          WebkitBackdropFilter: 'blur(20px) saturate(180%)',
-          border: '1px solid rgba(255,255,255,0.08)',
-        }}
-        animate={
-          isExpanded
-            ? { opacity: 0, scale: 0.5 }
-            : phase === 'pressing'
-            ? { scale: 0.96 }
-            : { opacity: 1, scale: 1 }
-        }
-        transition={{
-          type: 'spring',
-          stiffness: 500,
-          damping: 35,
+          background: isPressing
+            ? 'rgba(28, 28, 30, 0.95)'
+            : 'rgba(44, 44, 46, 0.92)',
+          backdropFilter: 'blur(20px) saturate(150%)',
+          WebkitBackdropFilter: 'blur(20px) saturate(150%)',
+          border: '1px solid rgba(255,255,255,0.12)',
+          boxShadow: isExpanded
+            ? '0 0 0 3px rgba(255, 255, 255, 0.18), 0 4px 24px rgba(0, 0, 0, 0.35)'
+            : '0 4px 16px rgba(0,0,0,0.2), inset 0 1px 2px rgba(255,255,255,0.15)',
+          transform: isPressing ? 'scale(0.94)' : isExpanded ? 'scale(1)' : 'scale(1)',
+          transition: 'transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1), background 0.2s ease, box-shadow 0.3s ease',
         }}
         onPointerDown={handlePressStart}
         onPointerUp={handlePressEnd}
         onPointerLeave={handlePressEnd}
         onPointerCancel={handlePressEnd}
       >
-        {/* Button inner glow */}
-        <motion.div
-          className="absolute inset-0 rounded-[inherit] pointer-events-none"
-          style={{
-            background: 'linear-gradient(135deg, rgba(255,255,255,0.08) 0%, transparent 50%)',
-            opacity: glowOpacity,
-          }}
-        />
-
-        {/* Button shadow */}
-        <motion.div
-          className="absolute inset-0 rounded-[inherit] pointer-events-none -z-10"
-          style={{
-            boxShadow: '0 4px 16px rgba(0,0,0,0.25), 0 1px 3px rgba(0,0,0,0.15)',
-          }}
-        />
-
-        {/* Microphone icon */}
-        <motion.svg
+        <svg
           width="22"
           height="22"
           viewBox="0 0 24 24"
           fill="none"
-          animate={
-            isListening
-              ? {
-                  scale: [1, 1.08, 1],
-                }
-              : {}
-          }
-          transition={{
-            duration: 3,
-            repeat: isListening ? Infinity : 0,
-            ease: 'easeInOut',
+          style={{
+            animation: isListening ? 'micPulse 3s ease-in-out infinite' : 'none',
           }}
         >
           <rect x="9" y="2" width="6" height="12" rx="3" fill="white" />
@@ -343,8 +284,39 @@ export default function VoiceInteraction() {
             strokeWidth="2"
             strokeLinecap="round"
           />
-        </motion.svg>
-      </motion.button>
+        </svg>
+      </button>
+
+      <style>{`
+        @keyframes breathe {
+          0%, 100% { transform: translateX(-50%) scaleY(1); opacity: 1; }
+          50% { transform: translateX(-50%) scaleY(1.04); opacity: 0.92; }
+        }
+
+        @keyframes breathe2 {
+          0%, 100% { transform: translateX(-50%) scaleY(1); opacity: 1; }
+          50% { transform: translateX(-50%) scaleY(1.06); opacity: 0.88; }
+        }
+        @keyframes rise {
+          0% { transform: translate(-50%, 0) scale(1); opacity: 0.7; }
+          100% { transform: translate(calc(-50% + var(--x)), -260px) scale(0.15); opacity: 0; }
+        }
+
+        @keyframes fadeIn {
+          from { opacity: 0; transform: translateX(-50%) translateY(10px); }
+          to { opacity: 1; transform: translateX(-50%) translateY(0); }
+        }
+
+        @keyframes waveBar {
+          0% { height: 12px; }
+          100% { height: 35px; }
+        }
+
+        @keyframes micPulse {
+          0%, 100% { transform: scale(1); }
+          50% { transform: scale(1.08); }
+        }
+      `}</style>
     </>
   )
 }

@@ -106,9 +106,9 @@ export default function VoiceInteraction() {
               left: '50%',
               bottom: '0',
               width: '180%',
-              height: isExpanded || isCollapsing ? '50%' : '0',
+              height: isExpanded ? '50%' : '0',
               transform: 'translateX(-50%)',
-              borderRadius: isExpanded || isCollapsing ? '48% 48% 0 0 / 26% 26% 0 0' : '50% 50% 0 0 / 32% 32% 0 0',
+              borderRadius: isExpanded ? '48% 48% 0 0 / 26% 26% 0 0' : '50% 50% 0 0 / 32% 32% 0 0',
               background: `radial-gradient(
                 ellipse 85% 75% at 50% 100%,
                 rgba(255, 255, 255, 0.35) 0%,
@@ -135,9 +135,9 @@ export default function VoiceInteraction() {
               left: '50%',
               bottom: '0',
               width: '220%',
-              height: isExpanded || isCollapsing ? '54%' : '0',
+              height: isExpanded ? '54%' : '0',
               transform: 'translateX(-50%)',
-              borderRadius: isExpanded || isCollapsing ? '46% 46% 0 0 / 24% 24% 0 0' : '50% 50% 0 0 / 38% 38% 0 0',
+              borderRadius: isExpanded ? '46% 46% 0 0 / 24% 24% 0 0' : '50% 50% 0 0 / 38% 38% 0 0',
               background: `radial-gradient(
                 ellipse 95% 85% at 50% 100%,
                 rgba(255, 255, 255, 0.18) 0%,
@@ -175,7 +175,7 @@ export default function VoiceInteraction() {
             />
           ))}
 
-          {isListening && (
+          {(isListening || isCollapsing) && (
             <div
               style={{
                 position: 'absolute',
@@ -185,7 +185,9 @@ export default function VoiceInteraction() {
                 display: 'flex',
                 alignItems: 'center',
                 gap: '6px',
-                animation: 'fadeIn 0.5s ease forwards',
+                animation: isListening
+                  ? 'fadeIn 0.5s ease forwards'
+                  : 'fadeOut 0.35s ease forwards',
               }}
             >
               {[12, 28, 18, 35, 22, 30, 15].map((maxHeight, i) => (
@@ -203,7 +205,7 @@ export default function VoiceInteraction() {
             </div>
           )}
 
-          {isListening && (
+          {(isListening || isCollapsing) && (
             <div
               style={{
                 position: 'absolute',
@@ -211,8 +213,10 @@ export default function VoiceInteraction() {
                 left: '50%',
                 transform: 'translateX(-50%)',
                 textAlign: 'center',
-                animation: 'fadeIn 0.6s ease 0.3s forwards',
-                opacity: 0,
+                animation: isListening
+                  ? 'fadeIn 0.6s ease 0.3s forwards'
+                  : 'fadeOut 0.3s ease forwards',
+                opacity: isListening ? 0 : 1,
               }}
             >
               <p style={{ color: 'rgba(255,255,255,0.9)', fontSize: '17px', fontWeight: 500, letterSpacing: '-0.01em', marginBottom: '6px' }}>
@@ -305,6 +309,11 @@ export default function VoiceInteraction() {
         @keyframes fadeIn {
           from { opacity: 0; transform: translateX(-50%) translateY(10px); }
           to { opacity: 1; transform: translateX(-50%) translateY(0); }
+        }
+
+        @keyframes fadeOut {
+          from { opacity: 1; transform: translateX(-50%) translateY(0); }
+          to { opacity: 0; transform: translateX(-50%) translateY(10px); }
         }
 
         @keyframes waveBar {

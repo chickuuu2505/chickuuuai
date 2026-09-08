@@ -77,24 +77,20 @@ function OdysseyIllustration() {
 // Top Navigation
 function TopNav() {
   return (
-    <div className="flex items-center justify-between px-5 pt-4 pb-2">
-      {/* Hamburger button */}
-      <button className="glass-button w-12 h-12 rounded-full flex items-center justify-center press-effect">
-        <svg width="18" height="12" viewBox="0 0 18 12" fill="none">
-          <line x1="1" y1="1" x2="17" y2="1" stroke="#1d1d1f" strokeWidth="1.8" strokeLinecap="round" />
-          <line x1="1" y1="6" x2="17" y2="6" stroke="#1d1d1f" strokeWidth="1.8" strokeLinecap="round" />
-          <line x1="1" y1="11" x2="17" y2="11" stroke="#1d1d1f" strokeWidth="1.8" strokeLinecap="round" />
+    <div className="flex items-center justify-between px-5 pt-3 pb-2">
+      <button className="glass-button w-14 h-14 rounded-full flex items-center justify-center press-effect">
+        <svg width="20" height="14" viewBox="0 0 20 14" fill="none">
+          <line x1="1" y1="1" x2="19" y2="1" stroke="#1d1d1f" strokeWidth="2" strokeLinecap="round" />
+          <line x1="1" y1="7" x2="19" y2="7" stroke="#1d1d1f" strokeWidth="2" strokeLinecap="round" />
+          <line x1="1" y1="13" x2="19" y2="13" stroke="#1d1d1f" strokeWidth="2" strokeLinecap="round" />
         </svg>
       </button>
 
-      {/* Bookmark + Calendar pill */}
-      <button className="glass-button flex items-center gap-4 px-4 py-2.5 rounded-full press-effect">
-        {/* Bookmark icon */}
-        <svg width="18" height="20" viewBox="0 0 20 22" fill="none">
+      <button className="glass-button flex items-center gap-5 px-5 py-3.5 rounded-full press-effect">
+        <svg width="20" height="22" viewBox="0 0 20 22" fill="none">
           <path d="M3 1h14a1 1 0 011 1v18.5l-8-5-8 5V2a1 1 0 011-1z" stroke="#1d1d1f" strokeWidth="1.8" fill="none" />
         </svg>
-        {/* Calendar icon */}
-        <svg width="18" height="18" viewBox="0 0 20 20" fill="none">
+        <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
           <rect x="1" y="3" width="18" height="16" rx="3" stroke="#1d1d1f" strokeWidth="1.8" fill="none" />
           <line x1="1" y1="8" x2="19" y2="8" stroke="#1d1d1f" strokeWidth="1.8" />
           <line x1="6" y1="1" x2="6" y2="5" stroke="#1d1d1f" strokeWidth="1.8" strokeLinecap="round" />
@@ -108,7 +104,7 @@ function TopNav() {
 // Greeting Section
 function GreetingSection() {
   return (
-    <div className="px-5 pt-5 pb-3 animate-fade-in-up">
+    <div className="px-5 pt-4 pb-3 animate-fade-in-up">
       <h1 className="text-[30px] leading-[38px] font-normal text-charcoal tracking-[-0.02em]">
         Good morning,{' '}
         <span className="font-bold">Arun.</span>
@@ -126,11 +122,11 @@ function GreetingSection() {
 // Action Buttons
 function ActionButtons() {
   return (
-    <div className="flex gap-2.5 px-5 mt-3 mb-6 animate-fade-in-up-delay-1">
-      <button className="glass-button flex-1 h-12 rounded-2xl flex items-center justify-center press-effect">
+    <div className="flex gap-3 px-5 mt-3 mb-6 animate-fade-in-up-delay-1">
+      <button className="glass-button flex-1 h-12 rounded-[18px] flex items-center justify-center press-effect">
         <span className="text-[15px] font-semibold text-charcoal">Plan today</span>
       </button>
-      <button className="glass-button flex-1 h-12 rounded-2xl flex items-center justify-center press-effect">
+      <button className="glass-button flex-1 h-12 rounded-[18px] flex items-center justify-center press-effect">
         <span className="text-[15px] font-semibold text-charcoal">Prep study</span>
       </button>
     </div>
@@ -142,7 +138,7 @@ function JumpBackInSection() {
   const scrollRef = useRef<HTMLDivElement>(null)
 
   return (
-    <div className="mt-4 animate-fade-in-up-delay-2">
+    <div className="mt-5 animate-fade-in-up-delay-2">
       <h2 className="text-[20px] font-bold text-charcoal px-5 mb-3 tracking-[-0.01em]">
         Jump back in
       </h2>
@@ -150,36 +146,33 @@ function JumpBackInSection() {
         ref={scrollRef}
         className="flex gap-3 overflow-x-auto hide-scrollbar smooth-scroll px-5 pb-2"
       >
-        {/* Card 1 - Ask anything */}
-        <button className="glass-card flex-shrink-0 w-[260px] h-[110px] rounded-[18px] flex items-center gap-3 p-3 card-press">
-          <div className="w-[80px] h-[80px] rounded-[12px] overflow-hidden flex-shrink-0">
+        <button className="glass-card flex-shrink-0 w-[260px] h-[110px] rounded-[20px] flex items-center gap-3 p-3 card-press">
+          <div className="w-[85px] h-[85px] rounded-[14px] overflow-hidden flex-shrink-0">
             <ThinkingPersonIllustration />
           </div>
-          <span className="text-[17px] font-bold text-charcoal leading-tight text-left">
+          <span className="text-[18px] font-bold text-charcoal leading-tight text-left">
             Ask anything
           </span>
         </button>
 
-        {/* Card 2 - Ready to Form */}
-        <button className="glass-card flex-shrink-0 w-[260px] h-[110px] rounded-[18px] flex items-center gap-3 p-3 card-press">
-          <div className="w-[80px] h-[80px] rounded-[12px] overflow-hidden flex-shrink-0">
+        <button className="glass-card flex-shrink-0 w-[260px] h-[110px] rounded-[20px] flex items-center gap-3 p-3 card-press">
+          <div className="w-[85px] h-[85px] rounded-[14px] overflow-hidden flex-shrink-0">
             <DocumentPersonIllustration />
           </div>
-          <span className="text-[17px] font-bold text-charcoal leading-tight text-left">
+          <span className="text-[18px] font-bold text-charcoal leading-tight text-left">
             Ready to Form...
           </span>
         </button>
 
-        {/* Card 3 - extra for scroll */}
-        <button className="glass-card flex-shrink-0 w-[260px] h-[110px] rounded-[18px] flex items-center gap-3 p-3 card-press">
-          <div className="w-[80px] h-[80px] rounded-[12px] overflow-hidden flex-shrink-0 bg-[#f5f0e8] flex items-center justify-center">
+        <button className="glass-card flex-shrink-0 w-[260px] h-[110px] rounded-[20px] flex items-center gap-3 p-3 card-press">
+          <div className="w-[85px] h-[85px] rounded-[14px] overflow-hidden flex-shrink-0 bg-[#f5f0e8] flex items-center justify-center">
             <svg viewBox="0 0 60 60" className="w-12 h-12">
               <circle cx="30" cy="30" r="25" fill="#e8e0d0" />
               <path d="M20 35 L30 20 L40 35 Z" fill="#2d5a3a" opacity="0.6" />
               <circle cx="30" cy="18" r="5" fill="#d4a574" />
             </svg>
           </div>
-          <span className="text-[17px] font-bold text-charcoal leading-tight text-left">
+          <span className="text-[18px] font-bold text-charcoal leading-tight text-left">
             Explore more
           </span>
         </button>
@@ -206,10 +199,9 @@ function RecapsSection() {
         ref={scrollRef}
         className="flex gap-3 overflow-x-auto hide-scrollbar smooth-scroll px-5 pb-2"
       >
-        {/* Recap Card 1 - Diurnal Temperature */}
-        <button className="glass-card flex-shrink-0 w-[230px] h-[240px] rounded-[18px] p-4 flex flex-col card-press text-left">
+        <button className="glass-card flex-shrink-0 w-[230px] h-[240px] rounded-[20px] p-4 flex flex-col card-press text-left">
           <span className="text-[12px] text-charcoal-light font-medium">Yesterday</span>
-          <h3 className="text-[19px] font-bold text-charcoal mt-1.5 leading-tight">
+          <h3 className="text-[20px] font-bold text-charcoal mt-1.5 leading-tight">
             Diurnal<br />Temperature<br />Variation
           </h3>
           <p className="text-[13px] text-charcoal-light mt-3 leading-[18px] line-clamp-4">
@@ -217,10 +209,9 @@ function RecapsSection() {
           </p>
         </button>
 
-        {/* Recap Card 2 - Calendar event */}
-        <button className="glass-card flex-shrink-0 w-[230px] h-[240px] rounded-[18px] p-4 flex flex-col card-press text-left">
+        <button className="glass-card flex-shrink-0 w-[230px] h-[240px] rounded-[20px] p-4 flex flex-col card-press text-left">
           <span className="text-[12px] text-charcoal-light font-medium">September 6</span>
-          <h3 className="text-[19px] font-bold text-charcoal mt-1.5 leading-tight">
+          <h3 className="text-[20px] font-bold text-charcoal mt-1.5 leading-tight">
             Calendar event<br />management
           </h3>
           <p className="text-[13px] text-charcoal-light mt-3 leading-[18px] line-clamp-4">
@@ -228,10 +219,9 @@ function RecapsSection() {
           </p>
         </button>
 
-        {/* Recap Card 3 - Astronomy */}
-        <button className="glass-card flex-shrink-0 w-[230px] h-[240px] rounded-[18px] p-4 flex flex-col card-press text-left">
+        <button className="glass-card flex-shrink-0 w-[230px] h-[240px] rounded-[20px] p-4 flex flex-col card-press text-left">
           <span className="text-[12px] text-charcoal-light font-medium">September 4</span>
-          <h3 className="text-[19px] font-bold text-charcoal mt-1.5 leading-tight">
+          <h3 className="text-[20px] font-bold text-charcoal mt-1.5 leading-tight">
             Earth &amp; Space<br />exploration
           </h3>
           <div className="mt-2 rounded-[10px] overflow-hidden h-[80px]">
@@ -251,7 +241,7 @@ function TrySomethingNewSection() {
   const scrollRef = useRef<HTMLDivElement>(null)
 
   return (
-    <div className="mt-6 pb-36 fade-bottom">
+    <div className="mt-6 pb-28 fade-bottom">
       <h2 className="text-[20px] font-bold text-charcoal px-5 mb-3 tracking-[-0.01em]">
         Try something new
       </h2>
@@ -259,8 +249,7 @@ function TrySomethingNewSection() {
         ref={scrollRef}
         className="flex gap-3 overflow-x-auto hide-scrollbar smooth-scroll px-5 pb-2"
       >
-        {/* Card 1 - Odyssey */}
-        <button className="flex-shrink-0 w-[230px] h-[160px] rounded-[18px] overflow-hidden card-press relative">
+        <button className="flex-shrink-0 w-[230px] h-[160px] rounded-[20px] overflow-hidden card-press relative">
           <div className="absolute inset-0">
             <OdysseyIllustration />
           </div>
@@ -271,8 +260,7 @@ function TrySomethingNewSection() {
           </div>
         </button>
 
-        {/* Card 2 */}
-        <button className="flex-shrink-0 w-[230px] h-[160px] rounded-[18px] overflow-hidden card-press relative bg-[#eee8dd]">
+        <button className="flex-shrink-0 w-[230px] h-[160px] rounded-[20px] overflow-hidden card-press relative bg-[#eee8dd]">
           <div className="absolute inset-0 flex items-center justify-center">
             <svg viewBox="0 0 200 120" className="w-full h-full p-5">
               <rect width="200" height="120" rx="12" fill="#e8e0d0" />
@@ -291,8 +279,7 @@ function TrySomethingNewSection() {
           </div>
         </button>
 
-        {/* Card 3 */}
-        <button className="flex-shrink-0 w-[230px] h-[160px] rounded-[18px] overflow-hidden card-press relative bg-[#eee8dd]">
+        <button className="flex-shrink-0 w-[230px] h-[160px] rounded-[20px] overflow-hidden card-press relative bg-[#eee8dd]">
           <div className="absolute inset-0 flex items-center justify-center">
             <svg viewBox="0 0 200 120" className="w-full h-full p-5">
               <rect width="200" height="120" rx="12" fill="#e5ddd0" />
@@ -320,8 +307,7 @@ function TrySomethingNewSection() {
 function BottomNav() {
   return (
     <div className="fixed bottom-0 left-0 right-0 z-50 safe-bottom">
-      <div className="flex items-end justify-between px-5 pb-5 pt-2">
-        {/* Plus button */}
+      <div className="flex items-end justify-between px-5 pb-4 pt-2">
         <button className="glass-button w-14 h-14 rounded-full flex items-center justify-center press-effect">
           <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
             <line x1="12" y1="4" x2="12" y2="20" stroke="#1d1d1f" strokeWidth="2" strokeLinecap="round" />
@@ -329,10 +315,8 @@ function BottomNav() {
           </svg>
         </button>
 
-        {/* Microphone button - Liquid Glass Voice Interaction */}
         <VoiceInteraction />
 
-        {/* Keyboard button */}
         <button className="glass-button w-14 h-14 rounded-full flex items-center justify-center press-effect">
           <svg width="20" height="20" viewBox="0 0 22 22" fill="none">
             <rect x="1" y="4" width="20" height="14" rx="3" stroke="#1d1d1f" strokeWidth="1.8" fill="none" />
@@ -353,7 +337,6 @@ function BottomNav() {
 function BackgroundGradients() {
   return (
     <div className="fixed inset-0 pointer-events-none z-0">
-      {/* Pale blue - lower left */}
       <div
         className="bg-gradient-blob"
         style={{
@@ -364,34 +347,31 @@ function BackgroundGradients() {
           background: 'radial-gradient(circle, rgba(186, 215, 244, 0.5) 0%, transparent 70%)',
         }}
       />
-      {/* Pale pink - right side */}
       <div
         className="bg-gradient-blob"
         style={{
           width: '300px',
           height: '300px',
-          top: '20%',
+          top: '25%',
           right: '-15%',
           background: 'radial-gradient(circle, rgba(244, 198, 210, 0.4) 0%, transparent 70%)',
         }}
       />
-      {/* Lavender - lower portion */}
       <div
         className="bg-gradient-blob"
         style={{
-          width: '380px',
-          height: '380px',
+          width: '400px',
+          height: '400px',
           bottom: '-5%',
           left: '20%',
           background: 'radial-gradient(circle, rgba(210, 196, 236, 0.35) 0%, transparent 70%)',
         }}
       />
-      {/* Subtle warm glow - top */}
       <div
         className="bg-gradient-blob"
         style={{
-          width: '250px',
-          height: '250px',
+          width: '280px',
+          height: '280px',
           top: '5%',
           left: '30%',
           background: 'radial-gradient(circle, rgba(255, 236, 210, 0.3) 0%, transparent 70%)',
@@ -409,31 +389,18 @@ function App() {
     <div className="w-full h-full relative overflow-hidden" style={{ backgroundColor: '#f8f7f4' }}>
       <BackgroundGradients />
 
-      {/* Scrollable content */}
       <div
         ref={scrollRef}
         className="relative z-10 h-full overflow-y-auto hide-scrollbar smooth-scroll"
       >
-        {/* Top Navigation */}
         <TopNav />
-
-        {/* Greeting */}
         <GreetingSection />
-
-        {/* Action Buttons */}
         <ActionButtons />
-
-        {/* Jump Back In */}
         <JumpBackInSection />
-
-        {/* Recaps */}
         <RecapsSection />
-
-        {/* Try Something New */}
         <TrySomethingNewSection />
       </div>
 
-      {/* Bottom Navigation - Fixed */}
       <BottomNav />
     </div>
   )

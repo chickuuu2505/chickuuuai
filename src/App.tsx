@@ -1,181 +1,128 @@
-import { useState, useEffect, useCallback } from 'react'
+import { useState } from 'react'
 
 function App() {
-  const [wave, setWave] = useState(false)
-  const [clicks, setClicks] = useState(0)
-  const [particles, setParticles] = useState<{ id: number; x: number; y: number; emoji: string }[]>([])
-  const [showMessage, setShowMessage] = useState(false)
+  const [inputValue, setInputValue] = useState('')
+  const [isFocused, setIsFocused] = useState(false)
 
-  const greetings = [
-    "Heyy! 👋",
-    "Hola! 🌮",
-    "Bonjour! 🥐",
-    "Ciao! 🍕",
-    "Namaste! 🙏",
-    "Konnichiwa! 🌸",
-    "Guten Tag! 🥨",
-    "Salam! ☕",
-    "Olá! 🎉",
-    "Annyeong! 🎎",
+  const suggestions = [
+    { icon: '💡', text: 'Help me brainstorm ideas' },
+    { icon: '✍️', text: 'Write a creative story' },
+    { icon: '📚', text: 'Explain a complex topic' },
+    { icon: '🎨', text: 'Generate image ideas' },
   ]
 
-  const [currentGreeting, setCurrentGreeting] = useState(0)
-  const [isAnimating, setIsAnimating] = useState(false)
-
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setIsAnimating(true)
-      setTimeout(() => {
-        setCurrentGreeting((prev) => (prev + 1) % greetings.length)
-        setIsAnimating(false)
-      }, 300)
-    }, 2500)
-    return () => clearInterval(interval)
-  }, [])
-
-  useEffect(() => {
-    const timeout = setTimeout(() => setShowMessage(true), 800)
-    return () => clearTimeout(timeout)
-  }, [])
-
-  const spawnParticles = useCallback((x: number, y: number) => {
-    const emojis = ['✨', '🎉', '💫', '⭐', '🌟', '💖', '🦋', '🌈']
-    const newParticles = Array.from({ length: 8 }, (_, i) => ({
-      id: Date.now() + i,
-      x: x + (Math.random() - 0.5) * 200,
-      y: y + (Math.random() - 0.5) * 200,
-      emoji: emojis[Math.floor(Math.random() * emojis.length)],
-    }))
-    setParticles((prev) => [...prev, ...newParticles])
-    setTimeout(() => {
-      setParticles((prev) => prev.filter((p) => !newParticles.find((np) => np.id === p.id)))
-    }, 1000)
-  }, [])
-
-  const handleWaveClick = (e: React.MouseEvent) => {
-    setWave(true)
-    setClicks((prev) => prev + 1)
-    spawnParticles(e.clientX, e.clientY)
-    setTimeout(() => setWave(false), 600)
-  }
-
-  const getGreetingMessage = () => {
-    if (clicks === 0) return "Click the hand to say hi back! 👆"
-    if (clicks < 3) return "Keep going! The vibes are immaculate ✨"
-    if (clicks < 7) return "You're on a roll! 🎉"
-    if (clicks < 15) return "Okay, you're officially the friendliest person ever 🏆"
-    if (clicks < 25) return "I think we're best friends now 💖"
-    return "You've unlocked ULTIMATE FRIENDSHIP STATUS 🌈🦄✨"
-  }
-
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-900 via-indigo-900 to-blue-900 flex flex-col items-center justify-center overflow-hidden relative">
-      {/* Animated background blobs */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-pink-500/20 rounded-full blur-3xl animate-pulse" />
-        <div className="absolute bottom-1/4 right-1/4 w-80 h-80 bg-cyan-500/20 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1s' }} />
-        <div className="absolute top-1/2 left-1/2 w-72 h-72 bg-yellow-500/10 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '2s' }} />
-      </div>
-
-      {/* Floating particles */}
-      {particles.map((particle) => (
-        <div
-          key={particle.id}
-          className="fixed text-2xl pointer-events-none animate-bounce"
-          style={{
-            left: particle.x,
-            top: particle.y,
-            animation: 'float-up 1s ease-out forwards',
-          }}
-        >
-          {particle.emoji}
+    <div className="min-h-screen bg-[#0f0f0f] flex flex-col">
+      {/* Header / Navbar */}
+      <header className="flex items-center justify-between px-6 py-4 border-b border-white/10">
+        <div className="flex items-center gap-3">
+          <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-violet-500 to-pink-500 flex items-center justify-center shadow-lg shadow-violet-500/30 overflow-hidden p-0.5">
+            <img 
+              src="https://image.qwenlm.ai/generated-images/05253d5c-e2a5-455c-9d48-f07884c41c33/_result.png" 
+              alt="Chickuuu Ai" 
+              className="w-full h-full rounded-lg object-cover"
+            />
+          </div>
+          <span className="text-white font-semibold text-lg tracking-tight">Chickuuu Ai</span>
         </div>
-      ))}
+        <div className="flex items-center gap-3">
+          <button className="text-white/60 hover:text-white transition-colors p-2 rounded-lg hover:bg-white/10">
+            <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z" />
+            </svg>
+          </button>
+          <button className="bg-gradient-to-r from-violet-600 to-pink-600 text-white px-4 py-2 rounded-xl text-sm font-medium hover:opacity-90 transition-opacity shadow-lg shadow-violet-500/20">
+            New Chat
+          </button>
+        </div>
+      </header>
 
-      {/* Main content */}
-      <div className="relative z-10 text-center px-4">
-        {/* Rotating greeting */}
-        <div className="mb-8">
-          <h1
-            className={`text-5xl md:text-7xl font-bold text-white transition-all duration-300 ${
-              isAnimating ? 'opacity-0 scale-90' : 'opacity-100 scale-100'
+      {/* Main Content */}
+      <main className="flex-1 flex flex-col items-center justify-center px-4 pb-8">
+        {/* Logo & Branding */}
+        <div className="flex flex-col items-center mb-10 animate-fade-in">
+          <div className="w-24 h-24 rounded-3xl bg-gradient-to-br from-violet-500 via-purple-500 to-pink-500 flex items-center justify-center shadow-2xl shadow-violet-500/40 mb-6 overflow-hidden p-1">
+            <img 
+              src="https://image.qwenlm.ai/generated-images/05253d5c-e2a5-455c-9d48-f07884c41c33/_result.png" 
+              alt="Chickuuu Ai Logo" 
+              className="w-full h-full rounded-2xl object-cover"
+            />
+          </div>
+          <h1 className="text-4xl md:text-5xl font-bold text-white mb-3 text-center">
+            Hey, I'm <span className="bg-gradient-to-r from-violet-400 to-pink-400 bg-clip-text text-transparent">Chickuuu</span>
+          </h1>
+          <p className="text-white/50 text-lg md:text-xl text-center max-w-md">
+            Your AI companion. Ask me anything, create anything, explore anything.
+          </p>
+        </div>
+
+        {/* Suggestion Cards */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 w-full max-w-2xl mb-8">
+          {suggestions.map((item, index) => (
+            <button
+              key={index}
+              className="flex items-center gap-3 p-4 rounded-2xl border border-white/10 bg-white/5 hover:bg-white/10 hover:border-white/20 transition-all duration-200 text-left group"
+            >
+              <span className="text-2xl">{item.icon}</span>
+              <span className="text-white/80 group-hover:text-white transition-colors text-sm md:text-base">
+                {item.text}
+              </span>
+              <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4 ml-auto text-white/30 group-hover:text-white/60 transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+              </svg>
+            </button>
+          ))}
+        </div>
+
+        {/* Chat Input */}
+        <div className="w-full max-w-2xl">
+          <div
+            className={`relative flex items-center bg-[#1a1a1a] border rounded-2xl transition-all duration-300 ${
+              isFocused
+                ? 'border-violet-500/50 shadow-lg shadow-violet-500/10'
+                : 'border-white/10'
             }`}
           >
-            {greetings[currentGreeting]}
-          </h1>
-        </div>
-
-        {/* Wave emoji button */}
-        <button
-          onClick={handleWaveClick}
-          className={`text-8xl md:text-9xl cursor-pointer transition-transform duration-300 hover:scale-110 active:scale-95 select-none ${
-            wave ? 'animate-bounce' : ''
-          }`}
-          style={{
-            filter: 'drop-shadow(0 0 20px rgba(255,255,255,0.3))',
-          }}
-        >
-          👋
-        </button>
-
-        {/* Click counter */}
-        <div className="mt-6">
-          <p className="text-white/60 text-sm font-mono">
-            waves sent: {clicks}
+            <input
+              type="text"
+              value={inputValue}
+              onChange={(e) => setInputValue(e.target.value)}
+              onFocus={() => setIsFocused(true)}
+              onBlur={() => setIsFocused(false)}
+              placeholder="Message Chickuuu Ai..."
+              className="flex-1 bg-transparent text-white placeholder-white/30 px-5 py-4 text-base outline-none"
+            />
+            <div className="flex items-center gap-2 pr-3">
+              <button className="p-2 rounded-xl text-white/40 hover:text-white/70 hover:bg-white/10 transition-all">
+                <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13" />
+                </svg>
+              </button>
+              <button
+                className={`p-2.5 rounded-xl transition-all duration-200 ${
+                  inputValue.trim()
+                    ? 'bg-gradient-to-r from-violet-600 to-pink-600 text-white shadow-lg shadow-violet-500/30 hover:opacity-90'
+                    : 'bg-white/10 text-white/30'
+                }`}
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M5 12h14M12 5l7 7-7 7" />
+                </svg>
+              </button>
+            </div>
+          </div>
+          <p className="text-center text-white/30 text-xs mt-3">
+            Chickuuu Ai can make mistakes. Consider checking important info.
           </p>
         </div>
+      </main>
 
-        {/* Message */}
-        <div
-          className={`mt-8 transition-all duration-700 ${
-            showMessage ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
-          }`}
-        >
-          <p className="text-xl md:text-2xl text-white/90 font-light">
-            {getGreetingMessage()}
-          </p>
-        </div>
-
-        {/* Fun facts / tips */}
-        <div className="mt-12 grid grid-cols-1 md:grid-cols-3 gap-4 max-w-3xl mx-auto">
-          <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-6 border border-white/20 hover:bg-white/15 transition-all duration-300 hover:scale-105">
-            <div className="text-3xl mb-3">🎨</div>
-            <h3 className="text-white font-semibold mb-1">Creative Vibes</h3>
-            <p className="text-white/60 text-sm">This page was made just for you, with love and code</p>
-          </div>
-          <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-6 border border-white/20 hover:bg-white/15 transition-all duration-300 hover:scale-105">
-            <div className="text-3xl mb-3">✨</div>
-            <h3 className="text-white font-semibold mb-1">Interactive</h3>
-            <p className="text-white/60 text-sm">Click the hand, watch the magic happen</p>
-          </div>
-          <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-6 border border-white/20 hover:bg-white/15 transition-all duration-300 hover:scale-105">
-            <div className="text-3xl mb-3">🚀</div>
-            <h3 className="text-white font-semibold mb-1">Built With</h3>
-            <p className="text-white/60 text-sm">React + Tailwind CSS + Good vibes</p>
-          </div>
-        </div>
-
-        {/* Footer message */}
-        <div className="mt-16 mb-8">
-          <p className="text-white/40 text-sm">
-            Made with 💜 • Click the hand {25 - clicks > 0 ? `${25 - clicks} more times` : '— you did it!'} to max out friendship
-          </p>
-        </div>
-      </div>
-
-      {/* Custom animation styles */}
-      <style>{`
-        @keyframes float-up {
-          0% {
-            opacity: 1;
-            transform: translateY(0) scale(1);
-          }
-          100% {
-            opacity: 0;
-            transform: translateY(-100px) scale(0.5);
-          }
-        }
-      `}</style>
+      {/* Footer */}
+      <footer className="text-center py-4 border-t border-white/5">
+        <p className="text-white/20 text-xs">
+          © 2025 Chickuuu Ai • Powered by Intelligence
+        </p>
+      </footer>
     </div>
   )
 }

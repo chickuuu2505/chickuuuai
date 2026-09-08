@@ -1,4 +1,4 @@
-import { useRef } from 'react'
+import { useRef, useState, useEffect } from 'react'
 import VoiceInteraction from './components/VoiceInteraction'
 
 function ThinkingPersonIllustration() {
@@ -296,31 +296,162 @@ function TrySomethingNewSection() {
   )
 }
 
+function ComposerBar({
+  visible,
+  inputRef,
+  onSend,
+  onBlur,
+}: {
+  visible: boolean
+  inputRef: React.RefObject<HTMLInputElement>
+  onSend: () => void
+  onBlur: () => void
+}) {
+  return (
+    <div
+      className="composer-card rounded-[26px] px-4 pt-3 pb-2.5"
+      style={{
+        opacity: visible ? 1 : 0,
+        transform: visible ? 'translateY(0) scale(1)' : 'translateY(8px) scale(0.98)',
+        pointerEvents: visible ? 'auto' : 'none',
+        transition: 'opacity 0.25s ease, transform 0.25s ease',
+      }}
+    >
+      <input
+        ref={inputRef}
+        type="text"
+        placeholder="Type something"
+        autoComplete="off"
+        className="composer-input w-full bg-transparent outline-none text-[16px] text-charcoal"
+        onBlur={onBlur}
+      />
+      <div className="flex items-center justify-between mt-2.5">
+        <div className="flex items-center gap-4">
+          <button
+            aria-label="Add photo"
+            className="press-effect"
+            onMouseDown={(e) => e.preventDefault()}
+          >
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+              <rect x="3" y="3" width="18" height="18" rx="4" stroke="#6e6e73" strokeWidth="1.6" />
+              <circle cx="8.5" cy="8.5" r="1.5" fill="#6e6e73" />
+              <path d="M4 16l5-5 3 3 4-5 4 5" stroke="#6e6e73" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" fill="none" />
+            </svg>
+          </button>
+          <button
+            aria-label="Camera"
+            className="press-effect"
+            onMouseDown={(e) => e.preventDefault()}
+          >
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+              <path d="M4 8a2 2 0 012-2h1.2l.8-1.4a1 1 0 01.87-.6h6.26a1 1 0 01.87.6L16.8 6H18a2 2 0 012 2v9a2 2 0 01-2 2H6a2 2 0 01-2-2V8z" stroke="#6e6e73" strokeWidth="1.6" fill="none" strokeLinejoin="round" />
+              <circle cx="12" cy="13" r="3.2" stroke="#6e6e73" strokeWidth="1.6" fill="none" />
+            </svg>
+          </button>
+          <button
+            aria-label="Notes"
+            className="press-effect"
+            onMouseDown={(e) => e.preventDefault()}
+          >
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+              <path d="M6 3h8l4 4v13a1 1 0 01-1 1H6a1 1 0 01-1-1V4a1 1 0 011-1z" stroke="#6e6e73" strokeWidth="1.6" fill="none" strokeLinejoin="round" />
+              <path d="M14 3v4h4" stroke="#6e6e73" strokeWidth="1.6" fill="none" strokeLinejoin="round" />
+              <line x1="8" y1="12" x2="16" y2="12" stroke="#6e6e73" strokeWidth="1.4" strokeLinecap="round" />
+              <line x1="8" y1="16" x2="13" y2="16" stroke="#6e6e73" strokeWidth="1.4" strokeLinecap="round" />
+            </svg>
+          </button>
+        </div>
+
+        <button
+          aria-label="Send"
+          className="w-9 h-9 rounded-full flex items-center justify-center flex-shrink-0 press-effect"
+          style={{ background: '#c7c7cc' }}
+          onClick={onSend}
+        >
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+            <path d="M12 19V5M12 5l-6 6M12 5l6 6" stroke="white" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" />
+          </svg>
+        </button>
+      </div>
+    </div>
+  )
+}
+
 function BottomNav() {
+  const [composerOpen, setComposerOpen] = useState(false)
+  const inputRef = useRef<HTMLInputElement>(null)
+
+  const openComposer = () => {
+    setComposerOpen(true)
+    // input is already mounted (just faded out), so this focus call is
+    // synchronous within the click gesture and reliably opens the
+    // native keyboard on mobile
+    inputRef.current?.focus()
+  }
+
+  const closeComposer = () => {
+    setComposerOpen(false)
+  }
+
+  const handleSend = () => {
+    inputRef.current?.blur()
+    setComposerOpen(false)
+  }
+
+  useEffect(() => {
+    if (!composerOpen && inputRef.current === document.activeElement) {
+      inputRef.current?.blur()
+    }
+  }, [composerOpen])
+
   return (
     <div className="fixed bottom-0 left-0 right-0 z-50 safe-bottom">
+      <div className="bottom-fade-gradient" />
       <div className="bottom-nav-frost" />
-      <div className="relative flex items-end justify-between px-5 pb-4 pt-2">
-        <button className="glass-button w-14 h-14 rounded-full flex items-center justify-center press-effect">
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
-            <line x1="12" y1="4" x2="12" y2="20" stroke="#1d1d1f" strokeWidth="2" strokeLinecap="round" />
-            <line x1="4" y1="12" x2="20" y2="12" stroke="#1d1d1f" strokeWidth="2" strokeLinecap="round" />
-          </svg>
-        </button>
 
-        <VoiceInteraction />
+      <div className="relative px-5 pb-4 pt-2 grid">
+        <div
+          className="[grid-area:1/1] flex items-end justify-between"
+          style={{
+            opacity: composerOpen ? 0 : 1,
+            transform: composerOpen ? 'translateY(4px)' : 'translateY(0)',
+            pointerEvents: composerOpen ? 'none' : 'auto',
+            transition: 'opacity 0.2s ease, transform 0.2s ease',
+          }}
+        >
+          <button className="glass-button w-14 h-14 rounded-full flex items-center justify-center press-effect">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+              <line x1="12" y1="4" x2="12" y2="20" stroke="#1d1d1f" strokeWidth="2" strokeLinecap="round" />
+              <line x1="4" y1="12" x2="20" y2="12" stroke="#1d1d1f" strokeWidth="2" strokeLinecap="round" />
+            </svg>
+          </button>
 
-        <button className="glass-button w-14 h-14 rounded-full flex items-center justify-center press-effect">
-          <svg width="20" height="20" viewBox="0 0 22 22" fill="none">
-            <rect x="1" y="4" width="20" height="14" rx="3" stroke="#1d1d1f" strokeWidth="1.8" fill="none" />
-            <rect x="4" y="7.5" width="3" height="2.5" rx="0.5" fill="#1d1d1f" />
-            <rect x="9.5" y="7.5" width="3" height="2.5" rx="0.5" fill="#1d1d1f" />
-            <rect x="15" y="7.5" width="3" height="2.5" rx="0.5" fill="#1d1d1f" />
-            <rect x="4" y="12" width="3" height="2.5" rx="0.5" fill="#1d1d1f" />
-            <rect x="9.5" y="12" width="3" height="2.5" rx="0.5" fill="#1d1d1f" />
-            <rect x="15" y="12" width="3" height="2.5" rx="0.5" fill="#1d1d1f" />
-          </svg>
-        </button>
+          <VoiceInteraction />
+
+          <button
+            className="glass-button w-14 h-14 rounded-full flex items-center justify-center press-effect"
+            onClick={openComposer}
+          >
+            <svg width="20" height="20" viewBox="0 0 22 22" fill="none">
+              <rect x="1" y="4" width="20" height="14" rx="3" stroke="#1d1d1f" strokeWidth="1.8" fill="none" />
+              <rect x="4" y="7.5" width="3" height="2.5" rx="0.5" fill="#1d1d1f" />
+              <rect x="9.5" y="7.5" width="3" height="2.5" rx="0.5" fill="#1d1d1f" />
+              <rect x="15" y="7.5" width="3" height="2.5" rx="0.5" fill="#1d1d1f" />
+              <rect x="4" y="12" width="3" height="2.5" rx="0.5" fill="#1d1d1f" />
+              <rect x="9.5" y="12" width="3" height="2.5" rx="0.5" fill="#1d1d1f" />
+              <rect x="15" y="12" width="3" height="2.5" rx="0.5" fill="#1d1d1f" />
+            </svg>
+          </button>
+        </div>
+
+        <div className="[grid-area:1/1] self-end">
+          <ComposerBar
+            visible={composerOpen}
+            inputRef={inputRef}
+            onSend={handleSend}
+            onBlur={closeComposer}
+          />
+        </div>
       </div>
     </div>
   )

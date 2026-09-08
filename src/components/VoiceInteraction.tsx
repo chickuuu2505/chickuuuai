@@ -3,8 +3,8 @@ import { useState, useRef, useEffect, useCallback } from 'react'
 export default function VoiceInteraction() {
   const [phase, setPhase] = useState<'idle' | 'pressing' | 'expanding' | 'listening' | 'collapsing'>('idle')
   const pressTimerRef = useRef<ReturnType<typeof setTimeout>>()
-  const expandTimerRef = useRef<ReturnType<typeof setTimeout>>()
   const breatheTimerRef = useRef<ReturnType<typeof setTimeout>>()
+  const unmountTimerRef = useRef<ReturnType<typeof setTimeout>>()
   const [particles, setParticles] = useState<Array<{ id: number; x: number; delay: number }>>([])
 
   useEffect(() => {
@@ -34,7 +34,6 @@ export default function VoiceInteraction() {
   const startExpansion = useCallback(() => {
     setPhase('expanding')
     spawnParticles()
-
     breatheTimerRef.current = setTimeout(() => {
       setPhase('listening')
     }, 1500)
@@ -45,19 +44,19 @@ export default function VoiceInteraction() {
     if (breatheTimerRef.current) {
       clearTimeout(breatheTimerRef.current)
     }
-    setTimeout(() => {
+    if (unmountTimerRef.current) {
+      clearTimeout(unmountTimerRef.current)
+    }
+    unmountTimerRef.current = setTimeout(() => {
       setPhase('idle')
-    }, 500)
+    }, 550)
   }, [])
 
   const handlePressStart = (e: React.PointerEvent) => {
     e.preventDefault()
     e.stopPropagation()
-
     if (phase !== 'idle') return
-
     setPhase('pressing')
-
     pressTimerRef.current = setTimeout(() => {
       startExpansion()
     }, 280)
@@ -67,7 +66,6 @@ export default function VoiceInteraction() {
     if (pressTimerRef.current) {
       clearTimeout(pressTimerRef.current)
     }
-
     if (phase === 'pressing') {
       setPhase('idle')
     } else if (phase === 'expanding' || phase === 'listening') {
@@ -78,8 +76,8 @@ export default function VoiceInteraction() {
   useEffect(() => {
     return () => {
       if (pressTimerRef.current) clearTimeout(pressTimerRef.current)
-      if (expandTimerRef.current) clearTimeout(expandTimerRef.current)
       if (breatheTimerRef.current) clearTimeout(breatheTimerRef.current)
+      if (unmountTimerRef.current) clearTimeout(unmountTimerRef.current)
     }
   }, [])
 
@@ -91,78 +89,114 @@ export default function VoiceInteraction() {
 
   return (
     <>
+      <svg
+        style={{ position: 'fixed', width: 0, height: 0, pointerEvents: 'none', zIndex: -1 }}
+        aria-hidden="true"
+      >
+        <defs>
+          <filter id="glass-filter" colorInterpolationFilters="sRGB" x="0%" y="0%" width="100%" height="100%">
+            <feTurbulence
+              type="fractalNoise"
+              baseFrequency="0.01"
+              numOctaves="2"
+              seed="3"
+              result="noise"
+            />
+            <feDisplacementMap
+              in="SourceGraphic"
+              in2="noise"
+              scale="12"
+              xChannelSelector="R"
+              yChannelSelector="G"
+            />
+          </filter>
+        </defs>
+      </svg>
+
       {isActive && (
         <div
           className="fixed inset-0 pointer-events-none z-40 overflow-hidden"
           style={{
             opacity: isCollapsing ? 0 : 1,
-            transition: isCollapsing ? 'opacity 0.5s ease' : 'opacity 0.25s ease',
+            transition: isCollapsing ? 'opacity 0.5s ease-out' : 'opacity 0.3s ease',
           }}
         >
           <div
-            className="liquid-veil"
             style={{
               position: 'absolute',
               left: '50%',
               bottom: '0',
               width: '180%',
-              height: isExpanded || isCollapsing ? '50%' : '0',
+              height: isExpanded ? '55%' : '0%',
               transform: 'translateX(-50%)',
-              borderRadius: isExpanded || isCollapsing ? '48% 48% 0 0 / 26% 26% 0 0' : '50% 50% 0 0 / 32% 32% 0 0',
-              background: `radial-gradient(
-                ellipse 85% 75% at 50% 100%,
-                rgba(255, 255, 255, 0.25) 0%,
-                rgba(255, 255, 255, 0.12) 30%,
-                rgba(255, 255, 255, 0.05) 55%,
-                rgba(255, 255, 255, 0.02) 75%,
-                transparent 100%
-              )`,
-              backdropFilter: 'blur(40px) saturate(140%)',
-              WebkitBackdropFilter: 'blur(40px) saturate(140%)',
+              borderRadius: isExpanded ? '48% 48% 0 0 / 26% 26% 0 0' : '50% 50% 0 0 / 32% 32% 0 0',
+              background: 'hsl(0 0% 100% / 0.06)',
+              backdropFilter: 'url(#glass-filter) saturate(1.3)',
+              WebkitBackdropFilter: 'url(#glass-filter) saturate(1.3)',
+              boxShadow: `
+                inset 0 0 2px 1px rgba(255,255,255,0.35),
+                inset 0 0 10px 4px rgba(255,255,255,0.15),
+                inset 0 4px 16px rgba(17,17,26,0.05),
+                inset 0 8px 24px rgba(17,17,26,0.05),
+                inset 0 6px 56px rgba(17,17,26,0.05)
+              `,
               WebkitMaskImage: 'linear-gradient(to top, #000 0%, #000 55%, rgba(0,0,0,0.6) 75%, rgba(0,0,0,0.25) 88%, transparent 100%)',
               maskImage: 'linear-gradient(to top, #000 0%, #000 55%, rgba(0,0,0,0.6) 75%, rgba(0,0,0,0.25) 88%, transparent 100%)',
-              willChange: 'height, opacity, transform',
-              transition: isCollapsing 
-                ? 'height 0.5s cubic-bezier(0.4, 0, 1, 1), border-radius 0.5s cubic-bezier(0.4, 0, 1, 1), opacity 0.5s cubic-bezier(0.4, 0, 1, 1)'
-                : 'height 1.5s cubic-bezier(0.25, 0.1, 0.25, 1), border-radius 1.5s cubic-bezier(0.25, 0.1, 0.25, 1), opacity 1.5s cubic-bezier(0.25, 0.1, 0.25, 1)',
-              opacity: isExpanded || isCollapsing ? 1 : 0,
+              willChange: 'height, opacity, border-radius',
+              transition: isCollapsing
+                ? 'height 0.5s cubic-bezier(0.4, 0, 1, 1), border-radius 0.5s cubic-bezier(0.4, 0, 1, 1)'
+                : 'height 1.5s cubic-bezier(0.25, 0.1, 0.25, 1), border-radius 1.5s cubic-bezier(0.25, 0.1, 0.25, 1)',
               animation: isListening ? 'breathe 2.5s ease-in-out infinite' : 'none',
             }}
           />
 
           <div
-            className="liquid-veil-2"
             style={{
               position: 'absolute',
               left: '50%',
               bottom: '0',
               width: '220%',
-              height: isExpanded || isCollapsing ? '54%' : '0',
+              height: isExpanded ? '58%' : '0%',
               transform: 'translateX(-50%)',
-              borderRadius: isExpanded || isCollapsing ? '46% 46% 0 0 / 24% 24% 0 0' : '50% 50% 0 0 / 38% 38% 0 0',
-              background: `radial-gradient(
-                ellipse 95% 85% at 50% 100%,
-                rgba(255, 255, 255, 0.12) 0%,
-                rgba(255, 255, 255, 0.04) 40%,
-                transparent 75%
-              )`,
-              backdropFilter: 'blur(28px) saturate(130%)',
-              WebkitBackdropFilter: 'blur(28px) saturate(130%)',
+              borderRadius: isExpanded ? '46% 46% 0 0 / 24% 24% 0 0' : '50% 50% 0 0 / 38% 38% 0 0',
+              background: 'hsl(0 0% 100% / 0.03)',
+              backdropFilter: 'url(#glass-filter) saturate(1.2)',
+              WebkitBackdropFilter: 'url(#glass-filter) saturate(1.2)',
+              boxShadow: `
+                inset 0 0 2px 1px rgba(255,255,255,0.2),
+                inset 0 0 8px 3px rgba(255,255,255,0.08)
+              `,
               WebkitMaskImage: 'linear-gradient(to top, #000 0%, #000 50%, rgba(0,0,0,0.5) 72%, rgba(0,0,0,0.15) 88%, transparent 100%)',
               maskImage: 'linear-gradient(to top, #000 0%, #000 50%, rgba(0,0,0,0.5) 72%, rgba(0,0,0,0.15) 88%, transparent 100%)',
-              willChange: 'height, opacity, transform',
+              willChange: 'height, border-radius',
               transition: isCollapsing
-                ? 'height 0.5s cubic-bezier(0.4, 0, 1, 1) 0.02s, opacity 0.5s cubic-bezier(0.4, 0, 1, 1) 0.02s'
-                : 'height 1.5s cubic-bezier(0.25, 0.1, 0.25, 1) 0.04s, opacity 1.5s cubic-bezier(0.25, 0.1, 0.25, 1) 0.04s',
-              opacity: isExpanded || isCollapsing ? 1 : 0,
+                ? 'height 0.5s cubic-bezier(0.4, 0, 1, 1) 0.02s, border-radius 0.5s cubic-bezier(0.4, 0, 1, 1) 0.02s'
+                : 'height 1.5s cubic-bezier(0.25, 0.1, 0.25, 1) 0.04s, border-radius 1.5s cubic-bezier(0.25, 0.1, 0.25, 1) 0.04s',
               animation: isListening ? 'breathe2 2.5s ease-in-out infinite 0.1s' : 'none',
+            }}
+          />
+
+          <div
+            style={{
+              position: 'absolute',
+              left: '50%',
+              bottom: '0',
+              width: '160%',
+              height: isExpanded ? '45%' : '0%',
+              transform: 'translateX(-50%)',
+              borderRadius: isExpanded ? '50% 50% 0 0 / 30% 30% 0 0' : '50% 50% 0 0 / 40% 40% 0 0',
+              background: 'radial-gradient(ellipse 80% 70% at 50% 100%, rgba(255,255,255,0.12) 0%, rgba(255,255,255,0.04) 40%, transparent 70%)',
+              willChange: 'height, border-radius',
+              transition: isCollapsing
+                ? 'height 0.5s cubic-bezier(0.4, 0, 1, 1) 0.01s, border-radius 0.5s cubic-bezier(0.4, 0, 1, 1) 0.01s'
+                : 'height 1.5s cubic-bezier(0.25, 0.1, 0.25, 1) 0.02s, border-radius 1.5s cubic-bezier(0.25, 0.1, 0.25, 1) 0.02s',
+              pointerEvents: 'none',
             }}
           />
 
           {particles.map((p) => (
             <div
               key={p.id}
-              className="particle"
               style={{
                 position: 'absolute',
                 width: '5px',
@@ -245,7 +279,7 @@ export default function VoiceInteraction() {
           boxShadow: isExpanded
             ? '0 0 0 3px rgba(255, 255, 255, 0.18), 0 4px 24px rgba(0, 0, 0, 0.35)'
             : '0 4px 16px rgba(0,0,0,0.2), inset 0 1px 2px rgba(255,255,255,0.15)',
-          transform: isPressing ? 'scale(0.94)' : isExpanded ? 'scale(1)' : 'scale(1)',
+          transform: isPressing ? 'scale(0.94)' : 'scale(1)',
           transition: 'transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1), background 0.2s ease, box-shadow 0.3s ease',
         }}
         onPointerDown={handlePressStart}
@@ -263,60 +297,33 @@ export default function VoiceInteraction() {
           }}
         >
           <rect x="9" y="2" width="6" height="12" rx="3" fill="white" />
-          <path
-            d="M5 11a7 7 0 0014 0"
-            stroke="white"
-            strokeWidth="2"
-            strokeLinecap="round"
-            fill="none"
-          />
-          <line
-            x1="12"
-            y1="18"
-            x2="12"
-            y2="22"
-            stroke="white"
-            strokeWidth="2"
-            strokeLinecap="round"
-          />
-          <line
-            x1="8"
-            y1="22"
-            x2="16"
-            y2="22"
-            stroke="white"
-            strokeWidth="2"
-            strokeLinecap="round"
-          />
+          <path d="M5 11a7 7 0 0014 0" stroke="white" strokeWidth="2" strokeLinecap="round" fill="none" />
+          <line x1="12" y1="18" x2="12" y2="22" stroke="white" strokeWidth="2" strokeLinecap="round" />
+          <line x1="8" y1="22" x2="16" y2="22" stroke="white" strokeWidth="2" strokeLinecap="round" />
         </svg>
       </button>
 
       <style>{`
         @keyframes breathe {
-          0%, 100% { transform: translateX(-50%) scaleY(1); opacity: 1; }
-          50% { transform: translateX(-50%) scaleY(1.04); opacity: 0.92; }
+          0%, 100% { transform: translateX(-50%) scaleY(1); }
+          50% { transform: translateX(-50%) scaleY(1.03); }
         }
-
         @keyframes breathe2 {
-          0%, 100% { transform: translateX(-50%) scaleY(1); opacity: 1; }
-          50% { transform: translateX(-50%) scaleY(1.06); opacity: 0.88; }
+          0%, 100% { transform: translateX(-50%) scaleY(1); }
+          50% { transform: translateX(-50%) scaleY(1.05); }
         }
-
         @keyframes rise {
           0% { transform: translate(-50%, 0) scale(1); opacity: 0.7; }
           100% { transform: translate(calc(-50% + var(--x)), -260px) scale(0.15); opacity: 0; }
         }
-
         @keyframes fadeIn {
           from { opacity: 0; transform: translateX(-50%) translateY(10px); }
           to { opacity: 1; transform: translateX(-50%) translateY(0); }
         }
-
         @keyframes waveBar {
           0% { height: 12px; }
           100% { height: 35px; }
         }
-
         @keyframes micPulse {
           0%, 100% { transform: scale(1); }
           50% { transform: scale(1.08); }

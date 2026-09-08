@@ -37,7 +37,7 @@ export default function VoiceInteraction() {
 
     breatheTimerRef.current = setTimeout(() => {
       setPhase('listening')
-    }, 1500)
+    }, 1000)
   }, [spawnParticles])
 
   const startCollapse = useCallback(() => {
@@ -47,7 +47,7 @@ export default function VoiceInteraction() {
     }
     setTimeout(() => {
       setPhase('idle')
-    }, 1550)
+    }, 550)
   }, [])
 
   const handlePressStart = (e: React.PointerEvent) => {
@@ -122,7 +122,9 @@ export default function VoiceInteraction() {
               WebkitMaskImage: 'linear-gradient(to top, #000 0%, #000 55%, rgba(0,0,0,0.6) 75%, rgba(0,0,0,0.25) 88%, transparent 100%)',
               maskImage: 'linear-gradient(to top, #000 0%, #000 55%, rgba(0,0,0,0.6) 75%, rgba(0,0,0,0.25) 88%, transparent 100%)',
               willChange: 'height, opacity, transform',
-              transition: 'height 1.5s cubic-bezier(0.25, 0.1, 0.25, 1), border-radius 1.5s cubic-bezier(0.25, 0.1, 0.25, 1), opacity 1.5s cubic-bezier(0.25, 0.1, 0.25, 1)',
+              transition: isCollapsing
+                ? 'height 0.5s cubic-bezier(0.4, 0, 0.2, 1), border-radius 0.5s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.5s cubic-bezier(0.4, 0, 0.2, 1)'
+                : 'height 1s cubic-bezier(0.25, 0.1, 0.25, 1), border-radius 1s cubic-bezier(0.25, 0.1, 0.25, 1), opacity 1s cubic-bezier(0.25, 0.1, 0.25, 1)',
               opacity: isExpanded || isCollapsing ? 1 : 0,
               animation: isListening ? 'breathe 2.5s ease-in-out infinite' : 'none',
             }}
@@ -149,7 +151,9 @@ export default function VoiceInteraction() {
               WebkitMaskImage: 'linear-gradient(to top, #000 0%, #000 50%, rgba(0,0,0,0.5) 72%, rgba(0,0,0,0.15) 88%, transparent 100%)',
               maskImage: 'linear-gradient(to top, #000 0%, #000 50%, rgba(0,0,0,0.5) 72%, rgba(0,0,0,0.15) 88%, transparent 100%)',
               willChange: 'height, opacity, transform',
-              transition: 'height 1.5s cubic-bezier(0.25, 0.1, 0.25, 1) 0.04s, opacity 1.5s cubic-bezier(0.25, 0.1, 0.25, 1) 0.04s',
+              transition: isCollapsing
+                ? 'height 0.5s cubic-bezier(0.4, 0, 0.2, 1) 0.02s, opacity 0.5s cubic-bezier(0.4, 0, 0.2, 1) 0.02s'
+                : 'height 1s cubic-bezier(0.25, 0.1, 0.25, 1) 0.04s, opacity 1s cubic-bezier(0.25, 0.1, 0.25, 1) 0.04s',
               opacity: isExpanded || isCollapsing ? 1 : 0,
               animation: isListening ? 'breathe2 2.5s ease-in-out infinite 0.1s' : 'none',
             }}
@@ -186,8 +190,8 @@ export default function VoiceInteraction() {
                 alignItems: 'center',
                 gap: '6px',
                 animation: isListening
-                  ? 'fadeIn 0.5s ease forwards'
-                  : 'fadeOut 0.35s ease forwards',
+                  ? 'fadeIn 0.4s ease forwards'
+                  : 'fadeOut 0.3s ease forwards',
               }}
             >
               {[12, 28, 18, 35, 22, 30, 15].map((maxHeight, i) => (
@@ -214,8 +218,8 @@ export default function VoiceInteraction() {
                 transform: 'translateX(-50%)',
                 textAlign: 'center',
                 animation: isListening
-                  ? 'fadeIn 0.6s ease 0.3s forwards'
-                  : 'fadeOut 0.3s ease forwards',
+                  ? 'fadeIn 0.4s ease 0.2s forwards'
+                  : 'fadeOut 0.25s ease forwards',
                 opacity: isListening ? 0 : 1,
               }}
             >
@@ -233,9 +237,9 @@ export default function VoiceInteraction() {
       <button
         className="relative z-50 flex items-center justify-center select-none touch-none"
         style={{
-          width: '140px',
-          height: '60px',
-          borderRadius: '30px',
+          width: '70px',
+          height: '30px',
+          borderRadius: '15px',
           background: isPressing
             ? 'rgba(28, 28, 30, 0.95)'
             : 'rgba(44, 44, 46, 0.92)',
@@ -254,8 +258,8 @@ export default function VoiceInteraction() {
         onPointerCancel={handlePressEnd}
       >
         <svg
-          width="22"
-          height="22"
+          width="18"
+          height="18"
           viewBox="0 0 24 24"
           fill="none"
           style={{

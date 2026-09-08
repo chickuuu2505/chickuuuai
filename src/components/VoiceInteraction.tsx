@@ -105,7 +105,7 @@ export default function VoiceInteraction() {
             <feDisplacementMap
               in="SourceGraphic"
               in2="noise"
-              scale="12"
+              scale="18"
               xChannelSelector="R"
               yChannelSelector="G"
             />
@@ -127,10 +127,10 @@ export default function VoiceInteraction() {
               left: '50%',
               bottom: '0',
               width: '180%',
-              height: isExpanded ? '55%' : '0%',
+              height: (isExpanded || isCollapsing) ? '55%' : '0%',
               transform: 'translateX(-50%)',
-              borderRadius: isExpanded ? '48% 48% 0 0 / 26% 26% 0 0' : '50% 50% 0 0 / 32% 32% 0 0',
-              background: 'hsl(0 0% 100% / 0.06)',
+              borderRadius: (isExpanded || isCollapsing) ? '48% 48% 0 0 / 26% 26% 0 0' : '50% 50% 0 0 / 32% 32% 0 0',
+              background: 'hsl(0 0% 100% / 0.15)',
               backdropFilter: 'url(#glass-filter) saturate(1.3)',
               WebkitBackdropFilter: 'url(#glass-filter) saturate(1.3)',
               boxShadow: `
@@ -156,10 +156,10 @@ export default function VoiceInteraction() {
               left: '50%',
               bottom: '0',
               width: '220%',
-              height: isExpanded ? '58%' : '0%',
+              height: (isExpanded || isCollapsing) ? '58%' : '0%',
               transform: 'translateX(-50%)',
-              borderRadius: isExpanded ? '46% 46% 0 0 / 24% 24% 0 0' : '50% 50% 0 0 / 38% 38% 0 0',
-              background: 'hsl(0 0% 100% / 0.03)',
+              borderRadius: (isExpanded || isCollapsing) ? '46% 46% 0 0 / 24% 24% 0 0' : '50% 50% 0 0 / 38% 38% 0 0',
+              background: 'hsl(0 0% 100% / 0.10)',
               backdropFilter: 'url(#glass-filter) saturate(1.2)',
               WebkitBackdropFilter: 'url(#glass-filter) saturate(1.2)',
               boxShadow: `
@@ -182,10 +182,10 @@ export default function VoiceInteraction() {
               left: '50%',
               bottom: '0',
               width: '160%',
-              height: isExpanded ? '45%' : '0%',
+              height: (isExpanded || isCollapsing) ? '45%' : '0%',
               transform: 'translateX(-50%)',
-              borderRadius: isExpanded ? '50% 50% 0 0 / 30% 30% 0 0' : '50% 50% 0 0 / 40% 40% 0 0',
-              background: 'radial-gradient(ellipse 80% 70% at 50% 100%, rgba(255,255,255,0.12) 0%, rgba(255,255,255,0.04) 40%, transparent 70%)',
+              borderRadius: (isExpanded || isCollapsing) ? '50% 50% 0 0 / 30% 30% 0 0' : '50% 50% 0 0 / 40% 40% 0 0',
+              background: 'radial-gradient(ellipse 80% 70% at 50% 100%, rgba(255,255,255,0.15) 0%, rgba(255,255,255,0.06) 40%, transparent 70%)',
               willChange: 'height, border-radius',
               transition: isCollapsing
                 ? 'height 0.5s cubic-bezier(0.4, 0, 1, 1) 0.01s, border-radius 0.5s cubic-bezier(0.4, 0, 1, 1) 0.01s'

@@ -24,6 +24,38 @@ html, body, #root {
   touch-action: pan-y;
 }
 
+.composer-card {
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(20px) saturate(160%);
+  -webkit-backdrop-filter: blur(20px) saturate(160%);
+  border: 1px solid rgba(255, 255, 255, 0.9);
+  box-shadow:
+    0 4px 20px rgba(0, 0, 0, 0.06),
+    0 1px 4px rgba(0, 0, 0, 0.03);
+}
+
+.composer-input {
+  border: none;
+  padding: 0;
+}
+
+.composer-input::placeholder {
+  color: #a8a8ad;
+}
+
+.bottom-fade-gradient {
+  position: absolute;
+  inset: 0;
+  top: -60px;
+  background: linear-gradient(
+    to bottom,
+    transparent 0%,
+    rgba(248, 247, 244, 0.55) 55%,
+    rgba(248, 247, 244, 0.92) 100%
+  );
+  pointer-events: none;
+}
+
 .bottom-nav-frost {
   position: absolute;
   inset: 0;

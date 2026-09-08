@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react'
+import { useRef } from 'react'
 import VoiceInteraction from './components/VoiceInteraction'
 
 // SVG Illustrations

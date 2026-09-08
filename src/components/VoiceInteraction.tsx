@@ -200,7 +200,7 @@ export default function VoiceInteraction() {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.3, duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
               >
-                {[...Array(7)].map((_, i) => (
+                {[12, 28, 18, 35, 22, 30, 15].map((maxHeight, i) => (
                   <motion.div
                     key={i}
                     className="rounded-full"
@@ -209,10 +209,10 @@ export default function VoiceInteraction() {
                       background: 'rgba(255,255,255,0.7)',
                     }}
                     animate={{
-                      height: ['12px', `${20 + Math.random() * 25}px`, '12px'],
+                      height: ['12px', `${maxHeight}px`, '12px'],
                     }}
                     transition={{
-                      duration: 0.8 + Math.random() * 0.4,
+                      duration: 0.8 + (i * 0.05),
                       repeat: Infinity,
                       delay: i * 0.1,
                       ease: 'easeInOut',

@@ -297,7 +297,6 @@ export default function VoiceInteraction() {
           0%, 100% { transform: translateX(-50%) scaleY(1); opacity: 1; }
           50% { transform: translateX(-50%) scaleY(1.06); opacity: 0.88; }
         }
-
         @keyframes rise {
           0% { transform: translate(-50%, 0) scale(1); opacity: 0.7; }
           100% { transform: translate(calc(-50% + var(--x)), -260px) scale(0.15); opacity: 0; }

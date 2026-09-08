@@ -237,15 +237,15 @@ export default function VoiceInteraction() {
       <button
         className="relative z-50 flex items-center justify-center select-none touch-none"
         style={{
-          width: '70px',
-          height: '30px',
-          borderRadius: '15px',
+          width: '95px',
+          height: '41px',
+          borderRadius: '20px',
           background: isPressing
             ? 'rgba(28, 28, 30, 0.95)'
             : 'rgba(44, 44, 46, 0.92)',
           backdropFilter: 'blur(20px) saturate(150%)',
           WebkitBackdropFilter: 'blur(20px) saturate(150%)',
-          border: '1px solid rgba(255,255,255,0.12)',
+          border: '1.5px solid rgba(255,255,255,0.55)',
           boxShadow: isExpanded
             ? '0 0 0 3px rgba(255, 255, 255, 0.18), 0 4px 24px rgba(0, 0, 0, 0.35)'
             : '0 4px 16px rgba(0,0,0,0.2), inset 0 1px 2px rgba(255,255,255,0.15)',
@@ -258,8 +258,8 @@ export default function VoiceInteraction() {
         onPointerCancel={handlePressEnd}
       >
         <svg
-          width="18"
-          height="18"
+          width="24"
+          height="24"
           viewBox="0 0 24 24"
           fill="none"
           style={{

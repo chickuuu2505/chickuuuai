@@ -2,1381 +2,593 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <!-- iOS Add to Home Screen PWA -->
-  <meta name="apple-mobile-web-app-capable" content="yes" />
-  <meta name="mobile-web-app-capable" content="yes" />
-  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
-  <meta name="apple-mobile-web-app-title" content="chickuuuai" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>chickuuuai</title>
-  <!-- Tailwind CSS via CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
     * {
-      font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', 'Helvetica Neue', system-ui, sans-serif;
+      font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Helvetica Neue', system-ui, sans-serif;
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
     }
+    
     html, body {
       width: 100%;
       height: 100%;
       overflow: hidden;
-      background-color: #f8f7f4;
-      color-scheme: light;
-      -webkit-font-smoothing: antialiased;
-      -webkit-tap-highlight-color: transparent;
-      -webkit-user-select: none;
-      user-select: none;
-      overscroll-behavior: none;
-      touch-action: pan-y;
+      background: #f8f7f4;
     }
+    
     #root {
       width: 100%;
       max-width: 430px;
       height: 100%;
       margin: 0 auto;
+      background: #f8f7f4;
+      position: relative;
       overflow: hidden;
-      background-color: #f8f7f4;
-      position: relative;
     }
-    @media (min-width: 431px) {
-      html, body { background-color: #dcdcde; }
-    }
-    @media (min-width: 431px) {
-      #root { box-shadow: 0 0 60px rgba(0,0,0,0.18); }
-    }
-    .safe-top { padding-top: env(safe-area-inset-top, 0px); }
     
-    /* Fix: Proper safe area handling for bottom */
-    .safe-bottom {
-      padding-bottom: env(safe-area-inset-bottom, 0px);
-      background: transparent;
+    /* Splash Screen */
+    #splash {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #1a1a1a;
+      z-index: 9999;
+      transition: opacity 0.6s ease-out;
     }
-
-    /* ---- Liquid Glass material ---- */
-    .glass-card, .glass-button {
-      position: relative;
-      background: rgba(255, 255, 255, 0.7);
-      backdrop-filter: blur(20px) saturate(165%);
-      -webkit-backdrop-filter: blur(20px) saturate(165%);
-      border: 1px solid rgba(255, 255, 255, 0.8);
-      box-shadow:
-        0 2px 8px rgba(0,0,0,0.03),
-        0 1px 3px rgba(0,0,0,0.02),
-        inset 0 1px 0 rgba(255,255,255,0.9),
-        inset 0 -1px 0 rgba(0,0,0,0.02);
-      transition: transform 0.35s cubic-bezier(0.34,1.56,0.64,1), box-shadow 0.3s ease, background 0.3s ease;
-    }
-    .glass-card::before, .glass-button::before {
-      content: '';
-      position: absolute;
-      inset: 0;
-      border-radius: inherit;
-      background: linear-gradient(135deg, rgba(255,255,255,0.55) 0%, rgba(255,255,255,0.08) 22%, transparent 45%);
-      opacity: 0.9;
+    
+    #splash.hide {
+      opacity: 0;
       pointer-events: none;
-      mix-blend-mode: overlay;
     }
-    .glass-button {
-      backdrop-filter: blur(16px) saturate(165%);
-      -webkit-backdrop-filter: blur(16px) saturate(165%);
-      background: rgba(255, 255, 255, 0.75);
-      border: 1px solid rgba(255, 255, 255, 0.9);
-      box-shadow:
-        0 2px 10px rgba(0,0,0,0.04),
-        0 1px 3px rgba(0,0,0,0.02),
-        inset 0 1px 0 rgba(255,255,255,0.95);
+    
+    #splash h1 {
+      font-size: 42px;
+      font-weight: 700;
+      color: #ffffff;
+      letter-spacing: 2px;
+      animation: pulse 1s ease-in-out;
     }
-    .mic-button {
-      background: #1d1d1f;
-      border: 3px solid rgba(255,255,255,0.9);
-      box-shadow: 0 4px 20px rgba(0,0,0,0.15), 0 2px 8px rgba(0,0,0,0.1);
+    
+    @keyframes pulse {
+      0% { transform: scale(0.8); opacity: 0; }
+      50% { transform: scale(1.1); opacity: 1; }
+      100% { transform: scale(1); opacity: 1; }
     }
-    .press-effect:active {
+    
+    /* Glass effect */
+    .glass {
+      background: rgba(255, 255, 255, 0.7);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid rgba(255, 255, 255, 0.8);
+      box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+    }
+    
+    .glass-dark {
+      background: rgba(28, 28, 30, 0.92);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 2px solid #ffffff;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.2);
+    }
+    
+    .press:active {
       transform: scale(0.92);
-      opacity: 0.8;
+      transition: transform 0.15s ease;
     }
+    
     .card-press:active {
       transform: scale(0.97);
-      box-shadow: 0 1px 4px rgba(0,0,0,0.05), inset 0 1px 0 rgba(255,255,255,0.9);
+      transition: transform 0.15s ease;
     }
-    @supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
-      .glass-card, .glass-button { background-color: #f1efe9; }
-      .glass-card::before, .glass-button::before { display: none; }
+    
+    .hide-scrollbar::-webkit-scrollbar {
+      display: none;
     }
-    @media (prefers-reduced-motion: reduce) {
-      .glass-card, .glass-button, .mic-button,
-      .animate-fade-in-up, .animate-fade-in-up-delay-1, .animate-fade-in-up-delay-2, .animate-fade-in-up-delay-3 {
-        animation: none !important;
-        transition: none !important;
-      }
-    }
+    
     .hide-scrollbar {
       -ms-overflow-style: none;
       scrollbar-width: none;
     }
-    .hide-scrollbar::-webkit-scrollbar { display: none; }
+    
     .smooth-scroll {
       -webkit-overflow-scrolling: touch;
       scroll-behavior: smooth;
-      overscroll-behavior-x: contain;
     }
-    .bg-gradient-blob {
-      position: absolute;
-      border-radius: 50%;
-      filter: blur(60px);
-      opacity: 0.8;
-    }
+    
     .fade-bottom {
       mask-image: linear-gradient(to bottom, black 70%, transparent 100%);
       -webkit-mask-image: linear-gradient(to bottom, black 70%, transparent 100%);
     }
-    .line-clamp-4 {
-      display: -webkit-box;
-      -webkit-line-clamp: 4;
-      -webkit-box-orient: vertical;
-      overflow: hidden;
-    }
+    
     .line-clamp-2 {
       display: -webkit-box;
       -webkit-line-clamp: 2;
       -webkit-box-orient: vertical;
       overflow: hidden;
     }
-    .bottom-nav-fade {
-      position: absolute;
-      inset: 0;
-      top: -80px;
-      background: linear-gradient(to bottom,
-        rgba(248, 247, 244, 0) 0%,
-        rgba(248, 247, 244, 0.55) 55%,
-        rgba(248, 247, 244, 0.9) 80%,
-        #f8f7f4 100%);
-      pointer-events: none;
+    
+    .line-clamp-4 {
+      display: -webkit-box;
+      -webkit-line-clamp: 4;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
     }
-    @keyframes fadeInUp {
+    
+    /* Animations */
+    @keyframes fadeUp {
       from { opacity: 0; transform: translateY(16px); }
       to { opacity: 1; transform: translateY(0); }
     }
-    .animate-fade-in-up { animation: fadeInUp 0.6s ease-out forwards; }
-    .animate-fade-in-up-delay-1 { animation: fadeInUp 0.6s ease-out 0.1s forwards; opacity: 0; }
-    .animate-fade-in-up-delay-2 { animation: fadeInUp 0.6s ease-out 0.2s forwards; opacity: 0; }
-    .animate-fade-in-up-delay-3 { animation: fadeInUp 0.6s ease-out 0.3s forwards; opacity: 0; }
-
-    /* voice interaction keyframes */
-    @keyframes breathe {
-      0%,100% { transform: translateX(-50%) scaleY(1); opacity: 1; }
-      50% { transform: translateX(-50%) scaleY(1.04); opacity: 0.92; }
+    
+    .fade-up { animation: fadeUp 0.5s ease forwards; }
+    .fade-up-delay-1 { animation: fadeUp 0.5s ease 0.1s forwards; opacity: 0; }
+    .fade-up-delay-2 { animation: fadeUp 0.5s ease 0.2s forwards; opacity: 0; }
+    .fade-up-delay-3 { animation: fadeUp 0.5s ease 0.3s forwards; opacity: 0; }
+    
+    /* Gradient blobs */
+    .blob {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(60px);
+      pointer-events: none;
     }
-    @keyframes breathe2 {
-      0%,100% { transform: translateX(-50%) scaleY(1); opacity: 1; }
-      50% { transform: translateX(-50%) scaleY(1.06); opacity: 0.88; }
-    }
-    @keyframes rise {
-      0% { transform: translate(-50%, 0) scale(1); opacity: 0.7; }
-      100% { transform: translate(calc(-50% + var(--x)), -260px) scale(0.15); opacity: 0; }
-    }
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateX(-50%) translateY(10px); }
-      to { opacity: 1; transform: translateX(-50%) translateY(0); }
-    }
-    @keyframes fadeOut {
-      from { opacity: 1; transform: translateX(-50%) translateY(0); }
-      to { opacity: 0; transform: translateX(-50%) translateY(10px); }
-    }
-    @keyframes waveBar {
-      0% { height: 12px; }
-      100% { height: 35px; }
-    }
-    @keyframes micPulse {
-      0%,100% { transform: scale(1); }
-      50% { transform: scale(1.08); }
-    }
-
-    .glass-card, .glass-button, .mic-button { will-change: transform; transform: translateZ(0); }
-    @media (max-height:700px) { .glass-card { height: auto !important; min-height: 90px; } }
-    @media (max-width:360px) { h1 { font-size: 26px !important; line-height: 34px !important; } }
   </style>
 </head>
 <body>
-<div id="root"></div>
+  <!-- Splash Screen -->
+  <div id="splash">
+    <h1>CHICKUUUAI</h1>
+  </div>
 
-<!-- React 18.3.1 production build -->
-<script src="https://unpkg.com/react@18.3.1/umd/react.production.min.js"></script>
-<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.production.min.js"></script>
+  <div id="root"></div>
 
-<!-- App code -->
-<script>
-const {
-  useState,
-  useRef,
-  useEffect,
-  useCallback
-} = React;
+  <!-- React -->
+  <script src="https://unpkg.com/react@18.3.1/umd/react.production.min.js"></script>
+  <script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.production.min.js"></script>
 
-// ---------- VoiceInteraction component ----------
-function VoiceInteraction() {
-  const [phase, setPhase] = useState('idle');
-  const pressTimerRef = useRef();
-  const breatheTimerRef = useRef();
-  const [particles, setParticles] = useState([]);
-  useEffect(() => {
-    if (phase !== 'idle' && phase !== 'collapsing') {
-      document.body.style.overflow = 'hidden';
-      document.body.style.touchAction = 'none';
-    } else {
-      document.body.style.overflow = '';
-      document.body.style.touchAction = '';
-    }
-    return () => {
-      document.body.style.overflow = '';
-      document.body.style.touchAction = '';
-    };
-  }, [phase]);
-  const spawnParticles = useCallback(() => {
-    const newParticles = Array.from({
-      length: 7
-    }, (_, i) => ({
-      id: Date.now() + i,
-      x: (Math.random() - 0.5) * 120,
-      delay: Math.random() * 0.25
-    }));
-    setParticles(newParticles);
-    setTimeout(() => setParticles([]), 1300);
-  }, []);
-  const startExpansion = useCallback(() => {
-    setPhase('expanding');
-    spawnParticles();
-    breatheTimerRef.current = setTimeout(() => {
-      setPhase('listening');
-    }, 750);
-  }, [spawnParticles]);
-  const startCollapse = useCallback(() => {
-    setPhase('collapsing');
-    if (breatheTimerRef.current) clearTimeout(breatheTimerRef.current);
+  <script>
+    // Hide splash after 1 second
     setTimeout(() => {
-      setPhase('idle');
-    }, 550);
-  }, []);
-  const handlePressStart = e => {
-    e.preventDefault();
-    e.stopPropagation();
-    if (phase !== 'idle') return;
-    setPhase('pressing');
-    pressTimerRef.current = setTimeout(() => {
-      startExpansion();
-    }, 150);
-  };
-  const handlePressEnd = () => {
-    if (pressTimerRef.current) {
-      clearTimeout(pressTimerRef.current);
-    }
-    if (phase === 'pressing') {
-      setPhase('idle');
-    } else if (phase === 'expanding' || phase === 'listening') {
-      startCollapse();
-    }
-  };
-  useEffect(() => {
-    return () => {
-      if (pressTimerRef.current) clearTimeout(pressTimerRef.current);
-      if (breatheTimerRef.current) clearTimeout(breatheTimerRef.current);
-    };
-  }, []);
-  const isActive = phase !== 'idle';
-  const isExpanded = phase === 'expanding' || phase === 'listening';
-  const isCollapsing = phase === 'collapsing';
-  const isListening = phase === 'listening';
-  const isPressing = phase === 'pressing';
-  return /*#__PURE__*/React.createElement(React.Fragment, null, isActive && /*#__PURE__*/React.createElement("div", {
-    className: "fixed inset-0 pointer-events-none z-40 overflow-hidden",
-    style: {
-      opacity: isActive ? 1 : 0,
-      transition: 'opacity 0.25s ease'
-    }
-  }, /*#__PURE__*/React.createElement("div", {
-    className: "liquid-veil",
-    style: {
-      position: 'absolute',
-      left: '50%',
-      bottom: '0',
-      width: '180%',
-      height: isExpanded ? '50%' : '0',
-      transform: 'translateX(-50%)',
-      borderRadius: isExpanded ? '48% 48% 0 0 / 26% 26% 0 0' : '50% 50% 0 0 / 32% 32% 0 0',
-      background: `radial-gradient(ellipse 85% 75% at 50% 100%, rgba(255,255,255,0.55) 0%, rgba(255,255,255,0.32) 30%, rgba(255,255,255,0.16) 55%, rgba(255,255,255,0.06) 75%, transparent 100%)`,
-      backdropFilter: 'blur(40px) saturate(140%)',
-      WebkitBackdropFilter: 'blur(40px) saturate(140%)',
-      WebkitMaskImage: 'linear-gradient(to top, #000 0%, #000 55%, rgba(0,0,0,0.6) 75%, rgba(0,0,0,0.25) 88%, transparent 100%)',
-      maskImage: 'linear-gradient(to top, #000 0%, #000 55%, rgba(0,0,0,0.6) 75%, rgba(0,0,0,0.25) 88%, transparent 100%)',
-      willChange: 'height, opacity, transform',
-      transition: isCollapsing ? 'height 0.5s cubic-bezier(0.4,0,0.2,1), border-radius 0.5s cubic-bezier(0.4,0,0.2,1), opacity 0.5s cubic-bezier(0.4,0,0.2,1)' : 'height 0.75s cubic-bezier(0.11,0.83,0.35,1), border-radius 0.75s cubic-bezier(0.11,0.83,0.35,1), opacity 0.75s cubic-bezier(0.11,0.83,0.35,1)',
-      opacity: isExpanded || isCollapsing ? 1 : 0,
-      animation: isListening ? 'breathe 2.5s ease-in-out infinite' : 'none'
-    }
-  }), /*#__PURE__*/React.createElement("div", {
-    className: "liquid-veil-2",
-    style: {
-      position: 'absolute',
-      left: '50%',
-      bottom: '0',
-      width: '220%',
-      height: isExpanded ? '54%' : '0',
-      transform: 'translateX(-50%)',
-      borderRadius: isExpanded ? '46% 46% 0 0 / 24% 24% 0 0' : '50% 50% 0 0 / 38% 38% 0 0',
-      background: `radial-gradient(ellipse 95% 85% at 50% 100%, rgba(255,255,255,0.32) 0%, rgba(255,255,255,0.14) 40%, transparent 75%)`,
-      backdropFilter: 'blur(28px) saturate(130%)',
-      WebkitBackdropFilter: 'blur(28px) saturate(130%)',
-      WebkitMaskImage: 'linear-gradient(to top, #000 0%, #000 50%, rgba(0,0,0,0.5) 72%, rgba(0,0,0,0.15) 88%, transparent 100%)',
-      maskImage: 'linear-gradient(to top, #000 0%, #000 50%, rgba(0,0,0,0.5) 72%, rgba(0,0,0,0.15) 88%, transparent 100%)',
-      willChange: 'height, opacity, transform',
-      transition: isCollapsing ? 'height 0.5s cubic-bezier(0.4,0,0.2,1) 0.02s, opacity 0.5s cubic-bezier(0.4,0,0.2,1) 0.02s' : 'height 0.75s cubic-bezier(0.11,0.83,0.35,1) 0.04s, opacity 0.75s cubic-bezier(0.11,0.83,0.35,1) 0.04s',
-      opacity: isExpanded || isCollapsing ? 1 : 0,
-      animation: isListening ? 'breathe2 2.5s ease-in-out infinite 0.1s' : 'none'
-    }
-  }), particles.map(p => /*#__PURE__*/React.createElement("div", {
-    key: p.id,
-    className: "particle",
-    style: {
-      position: 'absolute',
-      width: '5px',
-      height: '5px',
-      borderRadius: '50%',
-      background: 'rgba(255,255,255,0.6)',
-      boxShadow: '0 0 12px rgba(255,255,255,0.4)',
-      pointerEvents: 'none',
-      bottom: '52px',
-      left: '50%',
-      animation: `rise 1.1s cubic-bezier(0.16,1,0.3,1) ${p.delay}s forwards`,
-      ['--x']: `${p.x}px`
-    }
-  })), (isListening || isCollapsing) && /*#__PURE__*/React.createElement("div", {
-    style: {
-      position: 'absolute',
-      top: '35%',
-      left: '50%',
-      transform: 'translateX(-50%)',
-      display: 'flex',
-      alignItems: 'center',
-      gap: '6px',
-      animation: isListening ? 'fadeIn 0.4s ease forwards' : 'fadeOut 0.3s ease forwards'
-    }
-  }, [12, 28, 18, 35, 22, 30, 15].map((maxH, i) => /*#__PURE__*/React.createElement("div", {
-    key: i,
-    style: {
-      width: '3px',
-      borderRadius: '999px',
-      background: 'rgba(255,255,255,0.7)',
-      animation: `waveBar 0.8s ease-in-out ${i * 0.1}s infinite alternate`,
-      height: '12px'
-    }
-  }))), (isListening || isCollapsing) && /*#__PURE__*/React.createElement("div", {
-    style: {
-      position: 'absolute',
-      top: '48%',
-      left: '50%',
-      transform: 'translateX(-50%)',
-      textAlign: 'center',
-      opacity: isListening ? 0 : 1,
-      animation: isListening ? 'fadeIn 0.4s ease 0.2s forwards' : 'fadeOut 0.25s ease forwards'
-    }
-  }, /*#__PURE__*/React.createElement("p", {
-    style: {
-      color: 'rgba(255,255,255,0.9)',
-      fontSize: '17px',
-      fontWeight: 500,
-      letterSpacing: '-0.01em',
-      marginBottom: '6px'
-    }
-  }, "Listening..."), /*#__PURE__*/React.createElement("p", {
-    style: {
-      color: 'rgba(255,255,255,0.5)',
-      fontSize: '13px',
-      fontWeight: 400
-    }
-  }, "Release to send"))), /*#__PURE__*/React.createElement("button", {
-    className: "relative z-50 flex items-center justify-center select-none touch-none",
-    style: {
-      width: '103px',
-      height: '49px',
-      borderRadius: '25px',
-      background: isPressing ? 'rgba(28,28,30,0.95)' : 'rgba(44,44,46,0.92)',
-      backdropFilter: 'blur(20px) saturate(150%)',
-      WebkitBackdropFilter: 'blur(20px) saturate(150%)',
-      border: '2px solid #ffffff',
-      boxShadow: isExpanded ? '0 0 0 3px rgba(255,255,255,0.18), 0 4px 24px rgba(0,0,0,0.35)' : '0 4px 16px rgba(0,0,0,0.2), inset 0 1px 2px rgba(255,255,255,0.15)',
-      transform: isPressing || isExpanded ? 'scale(1.1)' : 'scale(1)',
-      transition: 'transform 0.35s cubic-bezier(0.25,0.46,0.45,0.94), background 0.2s ease, box-shadow 0.3s ease'
-    },
-    onPointerDown: handlePressStart,
-    onPointerUp: handlePressEnd,
-    onPointerLeave: handlePressEnd,
-    onPointerCancel: handlePressEnd
-  }, /*#__PURE__*/React.createElement("svg", {
-    width: "25",
-    height: "25",
-    viewBox: "0 0 24 24",
-    fill: "none",
-    style: {
-      animation: isListening ? 'micPulse 3s ease-in-out infinite' : 'none'
-    }
-  }, /*#__PURE__*/React.createElement("rect", {
-    x: "9",
-    y: "2",
-    width: "6",
-    height: "12",
-    rx: "3",
-    fill: "white"
-  }), /*#__PURE__*/React.createElement("path", {
-    d: "M5 11a7 7 0 0014 0",
-    stroke: "white",
-    strokeWidth: "2",
-    strokeLinecap: "round",
-    fill: "none"
-  }), /*#__PURE__*/React.createElement("line", {
-    x1: "12",
-    y1: "18",
-    x2: "12",
-    y2: "22",
-    stroke: "white",
-    strokeWidth: "2",
-    strokeLinecap: "round"
-  }), /*#__PURE__*/React.createElement("line", {
-    x1: "8",
-    y1: "22",
-    x2: "16",
-    y2: "22",
-    stroke: "white",
-    strokeWidth: "2",
-    strokeLinecap: "round"
-  }))));
-}
+      document.getElementById('splash').classList.add('hide');
+    }, 1000);
 
-// ---------- illustration components ----------
-function ThinkingPersonIllustration() {
-  return /*#__PURE__*/React.createElement("svg", {
-    viewBox: "0 0 110 110",
-    fill: "none",
-    className: "w-full h-full"
-  }, /*#__PURE__*/React.createElement("rect", {
-    width: "110",
-    height: "110",
-    rx: "16",
-    fill: "#f5f0e8"
-  }), /*#__PURE__*/React.createElement("ellipse", {
-    cx: "55",
-    cy: "90",
-    rx: "28",
-    ry: "18",
-    fill: "#2d5a3a"
-  }), /*#__PURE__*/React.createElement("rect", {
-    x: "49",
-    y: "55",
-    width: "12",
-    height: "14",
-    rx: "4",
-    fill: "#d4a574"
-  }), /*#__PURE__*/React.createElement("circle", {
-    cx: "55",
-    cy: "45",
-    r: "18",
-    fill: "#d4a574"
-  }), /*#__PURE__*/React.createElement("path", {
-    d: "M37 42c0-12 8-20 18-20s18 8 18 20c0 2-1 3-2 3-3-8-8-12-16-12s-13 4-16 12c-1 0-2-1-2-3z",
-    fill: "#2c2c2c"
-  }), /*#__PURE__*/React.createElement("circle", {
-    cx: "49",
-    cy: "45",
-    r: "1.5",
-    fill: "#2c2c2c"
-  }), /*#__PURE__*/React.createElement("circle", {
-    cx: "61",
-    cy: "45",
-    r: "1.5",
-    fill: "#2c2c2c"
-  }), /*#__PURE__*/React.createElement("path", {
-    d: "M52 51c1.5 1.5 4.5 1.5 6 0",
-    stroke: "#2c2c2c",
-    strokeWidth: "1.2",
-    strokeLinecap: "round",
-    fill: "none"
-  }), /*#__PURE__*/React.createElement("text", {
-    x: "78",
-    y: "32",
-    fontSize: "22",
-    fontWeight: "bold",
-    fill: "#2d5a3a",
-    opacity: "0.7"
-  }, "?"), /*#__PURE__*/React.createElement("path", {
-    d: "M40 75c-5-5-3-15 2-18",
-    stroke: "#d4a574",
-    strokeWidth: "6",
-    strokeLinecap: "round",
-    fill: "none"
-  }));
-}
-function DocumentPersonIllustration() {
-  return /*#__PURE__*/React.createElement("svg", {
-    viewBox: "0 0 110 110",
-    fill: "none",
-    className: "w-full h-full"
-  }, /*#__PURE__*/React.createElement("rect", {
-    width: "110",
-    height: "110",
-    rx: "16",
-    fill: "#f5f0e8"
-  }), /*#__PURE__*/React.createElement("ellipse", {
-    cx: "45",
-    cy: "92",
-    rx: "24",
-    ry: "16",
-    fill: "#2d5a3a"
-  }), /*#__PURE__*/React.createElement("rect", {
-    x: "40",
-    y: "58",
-    width: "10",
-    height: "12",
-    rx: "4",
-    fill: "#d4a574"
-  }), /*#__PURE__*/React.createElement("circle", {
-    cx: "45",
-    cy: "48",
-    r: "16",
-    fill: "#d4a574"
-  }), /*#__PURE__*/React.createElement("path", {
-    d: "M29 45c0-11 7-18 16-18s16 7 16 18c0 2-1 2-2 2-3-7-7-10-14-10s-11 3-14 10c-1 0-2 0-2-2z",
-    fill: "#2c2c2c"
-  }), /*#__PURE__*/React.createElement("circle", {
-    cx: "40",
-    cy: "48",
-    r: "1.3",
-    fill: "#2c2c2c"
-  }), /*#__PURE__*/React.createElement("circle", {
-    cx: "50",
-    cy: "48",
-    r: "1.3",
-    fill: "#2c2c2c"
-  }), /*#__PURE__*/React.createElement("path", {
-    d: "M43 53c1 1 3 1 4 0",
-    stroke: "#2c2c2c",
-    strokeWidth: "1",
-    strokeLinecap: "round",
-    fill: "none"
-  }), /*#__PURE__*/React.createElement("rect", {
-    x: "65",
-    y: "35",
-    width: "30",
-    height: "40",
-    rx: "3",
-    fill: "white",
-    stroke: "#ddd",
-    strokeWidth: "1"
-  }), /*#__PURE__*/React.createElement("line", {
-    x1: "70",
-    y1: "45",
-    x2: "90",
-    y2: "45",
-    stroke: "#ccc",
-    strokeWidth: "2",
-    strokeLinecap: "round"
-  }), /*#__PURE__*/React.createElement("line", {
-    x1: "70",
-    y1: "51",
-    x2: "87",
-    y2: "51",
-    stroke: "#ccc",
-    strokeWidth: "2",
-    strokeLinecap: "round"
-  }), /*#__PURE__*/React.createElement("line", {
-    x1: "70",
-    y1: "57",
-    x2: "85",
-    y2: "57",
-    stroke: "#ccc",
-    strokeWidth: "2",
-    strokeLinecap: "round"
-  }), /*#__PURE__*/React.createElement("line", {
-    x1: "70",
-    y1: "63",
-    x2: "82",
-    y2: "63",
-    stroke: "#ccc",
-    strokeWidth: "2",
-    strokeLinecap: "round"
-  }), /*#__PURE__*/React.createElement("path", {
-    d: "M58 72c5-3 8-8 10-12",
-    stroke: "#d4a574",
-    strokeWidth: "5",
-    strokeLinecap: "round",
-    fill: "none"
-  }));
-}
-function AstronomyIllustration() {
-  return /*#__PURE__*/React.createElement("svg", {
-    viewBox: "0 0 275 180",
-    fill: "none",
-    className: "w-full h-full"
-  }, /*#__PURE__*/React.createElement("rect", {
-    width: "275",
-    height: "180",
-    rx: "16",
-    fill: "#f0ede6"
-  }), /*#__PURE__*/React.createElement("circle", {
-    cx: "137",
-    cy: "90",
-    r: "45",
-    fill: "#4a90d9"
-  }), /*#__PURE__*/React.createElement("path", {
-    d: "M110 70c10-5 20-3 25 5s15 8 20 2-5-15-15-18-25 0-30 11z",
-    fill: "#5cb85c"
-  }), /*#__PURE__*/React.createElement("path", {
-    d: "M145 95c8 3 15 10 12 18s-12 8-18 3-5-15 6-21z",
-    fill: "#5cb85c"
-  }), /*#__PURE__*/React.createElement("ellipse", {
-    cx: "137",
-    cy: "90",
-    rx: "65",
-    ry: "25",
-    stroke: "#c4b5a0",
-    strokeWidth: "1",
-    strokeDasharray: "4 3",
-    fill: "none"
-  }), /*#__PURE__*/React.createElement("circle", {
-    cx: "50",
-    cy: "30",
-    r: "2",
-    fill: "#c4b5a0"
-  }), /*#__PURE__*/React.createElement("circle", {
-    cx: "220",
-    cy: "45",
-    r: "1.5",
-    fill: "#c4b5a0"
-  }), /*#__PURE__*/React.createElement("circle", {
-    cx: "240",
-    cy: "130",
-    r: "2",
-    fill: "#c4b5a0"
-  }), /*#__PURE__*/React.createElement("circle", {
-    cx: "30",
-    cy: "140",
-    r: "1.5",
-    fill: "#c4b5a0"
-  }), /*#__PURE__*/React.createElement("circle", {
-    cx: "80",
-    cy: "155",
-    r: "1",
-    fill: "#c4b5a0"
-  }), /*#__PURE__*/React.createElement("circle", {
-    cx: "200",
-    cy: "25",
-    r: "1",
-    fill: "#c4b5a0"
-  }), /*#__PURE__*/React.createElement("circle", {
-    cx: "195",
-    cy: "70",
-    r: "10",
-    fill: "#e8e0d0"
-  }), /*#__PURE__*/React.createElement("circle", {
-    cx: "199",
-    cy: "67",
-    r: "10",
-    fill: "#f0ede6"
-  }));
-}
-function OdysseyIllustration() {
-  return /*#__PURE__*/React.createElement("svg", {
-    viewBox: "0 0 275 160",
-    fill: "none",
-    className: "w-full h-full"
-  }, /*#__PURE__*/React.createElement("rect", {
-    width: "275",
-    height: "160",
-    rx: "16",
-    fill: "#eee8dd"
-  }), /*#__PURE__*/React.createElement("path", {
-    d: "M0 100 Q40 90 80 100 Q120 110 160 100 Q200 90 240 100 Q260 105 275 100 L275 160 L0 160 Z",
-    fill: "#7cb5d4",
-    opacity: "0.4"
-  }), /*#__PURE__*/React.createElement("path", {
-    d: "M0 110 Q40 100 80 110 Q120 120 160 110 Q200 100 240 110 Q260 115 275 110 L275 160 L0 160 Z",
-    fill: "#7cb5d4",
-    opacity: "0.3"
-  }), /*#__PURE__*/React.createElement("path", {
-    d: "M100 85 L170 85 L160 100 L110 100 Z",
-    fill: "#8b6f47"
-  }), /*#__PURE__*/React.createElement("rect", {
-    x: "133",
-    y: "50",
-    width: "3",
-    height: "35",
-    fill: "#6b5035"
-  }), /*#__PURE__*/React.createElement("path", {
-    d: "M136 52 L165 75 L136 80 Z",
-    fill: "#f5f0e8",
-    stroke: "#d4c5b0",
-    strokeWidth: "0.5"
-  }), /*#__PURE__*/React.createElement("circle", {
-    cx: "220",
-    cy: "40",
-    r: "18",
-    fill: "#f0c75e",
-    opacity: "0.6"
-  }));
-}
+    const { useState, useRef, useEffect, useCallback } = React;
 
-// ---------- UI components ----------
-function TopNav() {
-  return /*#__PURE__*/React.createElement("div", {
-    className: "flex items-center justify-between px-5 pt-3 pb-2"
-  }, /*#__PURE__*/React.createElement("button", {
-    className: "glass-button w-14 h-14 rounded-full flex items-center justify-center press-effect"
-  }, /*#__PURE__*/React.createElement("svg", {
-    width: "20",
-    height: "14",
-    viewBox: "0 0 20 14",
-    fill: "none"
-  }, /*#__PURE__*/React.createElement("line", {
-    x1: "1",
-    y1: "1",
-    x2: "19",
-    y2: "1",
-    stroke: "#1d1d1f",
-    strokeWidth: "2",
-    strokeLinecap: "round"
-  }), /*#__PURE__*/React.createElement("line", {
-    x1: "1",
-    y1: "7",
-    x2: "19",
-    y2: "7",
-    stroke: "#1d1d1f",
-    strokeWidth: "2",
-    strokeLinecap: "round"
-  }), /*#__PURE__*/React.createElement("line", {
-    x1: "1",
-    y1: "13",
-    x2: "19",
-    y2: "13",
-    stroke: "#1d1d1f",
-    strokeWidth: "2",
-    strokeLinecap: "round"
-  }))), /*#__PURE__*/React.createElement("button", {
-    className: "glass-button flex items-center gap-5 px-5 py-3.5 rounded-full press-effect"
-  }, /*#__PURE__*/React.createElement("svg", {
-    width: "20",
-    height: "22",
-    viewBox: "0 0 20 22",
-    fill: "none"
-  }, /*#__PURE__*/React.createElement("path", {
-    d: "M3 1h14a1 1 0 011 1v18.5l-8-5-8 5V2a1 1 0 011-1z",
-    stroke: "#1d1d1f",
-    strokeWidth: "1.8",
-    fill: "none"
-  })), /*#__PURE__*/React.createElement("svg", {
-    width: "20",
-    height: "20",
-    viewBox: "0 0 20 20",
-    fill: "none"
-  }, /*#__PURE__*/React.createElement("rect", {
-    x: "1",
-    y: "3",
-    width: "18",
-    height: "16",
-    rx: "3",
-    stroke: "#1d1d1f",
-    strokeWidth: "1.8",
-    fill: "none"
-  }), /*#__PURE__*/React.createElement("line", {
-    x1: "1",
-    y1: "8",
-    x2: "19",
-    y2: "8",
-    stroke: "#1d1d1f",
-    strokeWidth: "1.8"
-  }), /*#__PURE__*/React.createElement("line", {
-    x1: "6",
-    y1: "1",
-    x2: "6",
-    y2: "5",
-    stroke: "#1d1d1f",
-    strokeWidth: "1.8",
-    strokeLinecap: "round"
-  }), /*#__PURE__*/React.createElement("line", {
-    x1: "14",
-    y1: "1",
-    x2: "14",
-    y2: "5",
-    stroke: "#1d1d1f",
-    strokeWidth: "1.8",
-    strokeLinecap: "round"
-  }))));
-}
-function GreetingSection() {
-  return /*#__PURE__*/React.createElement("div", {
-    className: "px-5 pt-4 pb-3 animate-fade-in-up"
-  }, /*#__PURE__*/React.createElement("h1", {
-    className: "text-[24px] leading-[30px] font-normal text-[#1d1d1f] tracking-[-0.02em]"
-  }, "Good morning, ", /*#__PURE__*/React.createElement("span", {
-    className: "font-bold"
-  }, "Arun.")), /*#__PURE__*/React.createElement("p", {
-    className: "text-[21px] leading-[27px] text-[#1d1d1f] tracking-[-0.02em] mt-1"
-  }, "🏋️ ", /*#__PURE__*/React.createElement("span", {
-    className: "font-bold"
-  }, "workout"), " is at ", /*#__PURE__*/React.createElement("span", {
-    className: "font-normal"
-  }, "4:25")), /*#__PURE__*/React.createElement("p", {
-    className: "text-[21px] leading-[27px] text-[#1d1d1f] tracking-[-0.02em]"
-  }, "PM today."));
-}
-function ActionButtons() {
-  return /*#__PURE__*/React.createElement("div", {
-    className: "flex gap-3 px-5 mt-3 mb-6 animate-fade-in-up-delay-1"
-  }, /*#__PURE__*/React.createElement("button", {
-    className: "glass-button flex-1 h-12 rounded-[18px] flex items-center justify-center press-effect"
-  }, /*#__PURE__*/React.createElement("span", {
-    className: "text-[15px] font-semibold text-[#1d1d1f]"
-  }, "Plan today")), /*#__PURE__*/React.createElement("button", {
-    className: "glass-button flex-1 h-12 rounded-[18px] flex items-center justify-center press-effect"
-  }, /*#__PURE__*/React.createElement("span", {
-    className: "text-[15px] font-semibold text-[#1d1d1f]"
-  }, "Prep study")));
-}
-function JumpBackInSection() {
-  return /*#__PURE__*/React.createElement("div", {
-    className: "mt-5 animate-fade-in-up-delay-2"
-  }, /*#__PURE__*/React.createElement("h2", {
-    className: "text-[17px] font-bold text-[#1d1d1f] px-5 mb-3 tracking-[-0.01em]"
-  }, "Jump back in"), /*#__PURE__*/React.createElement("div", {
-    className: "flex gap-3 overflow-x-auto hide-scrollbar smooth-scroll px-5 pb-2"
-  }, /*#__PURE__*/React.createElement("button", {
-    className: "glass-card flex-shrink-0 w-[210px] h-[92px] rounded-[20px] flex items-center gap-3 p-3 card-press"
-  }, /*#__PURE__*/React.createElement("div", {
-    className: "w-[68px] h-[68px] rounded-[14px] overflow-hidden flex-shrink-0"
-  }, /*#__PURE__*/React.createElement(ThinkingPersonIllustration, null)), /*#__PURE__*/React.createElement("span", {
-    className: "text-[15px] font-bold text-[#1d1d1f] leading-tight text-left"
-  }, "Ask anything")), /*#__PURE__*/React.createElement("button", {
-    className: "glass-card flex-shrink-0 w-[210px] h-[92px] rounded-[20px] flex items-center gap-3 p-3 card-press"
-  }, /*#__PURE__*/React.createElement("div", {
-    className: "w-[68px] h-[68px] rounded-[14px] overflow-hidden flex-shrink-0"
-  }, /*#__PURE__*/React.createElement(DocumentPersonIllustration, null)), /*#__PURE__*/React.createElement("span", {
-    className: "text-[15px] font-bold text-[#1d1d1f] leading-tight text-left"
-  }, "Ready to Form...")), /*#__PURE__*/React.createElement("button", {
-    className: "glass-card flex-shrink-0 w-[210px] h-[92px] rounded-[20px] flex items-center gap-3 p-3 card-press"
-  }, /*#__PURE__*/React.createElement("div", {
-    className: "w-[68px] h-[68px] rounded-[14px] overflow-hidden bg-[#f5f0e8] flex items-center justify-center"
-  }, /*#__PURE__*/React.createElement("svg", {
-    viewBox: "0 0 60 60",
-    className: "w-12 h-12"
-  }, /*#__PURE__*/React.createElement("circle", {
-    cx: "30",
-    cy: "30",
-    r: "25",
-    fill: "#e8e0d0"
-  }), /*#__PURE__*/React.createElement("path", {
-    d: "M20 35 L30 20 L40 35 Z",
-    fill: "#2d5a3a",
-    opacity: "0.6"
-  }), /*#__PURE__*/React.createElement("circle", {
-    cx: "30",
-    cy: "18",
-    r: "5",
-    fill: "#d4a574"
-  }))), /*#__PURE__*/React.createElement("span", {
-    className: "text-[15px] font-bold text-[#1d1d1f] leading-tight text-left"
-  }, "Explore more"))));
-}
-function RecapsSection() {
-  return /*#__PURE__*/React.createElement("div", {
-    className: "mt-6 animate-fade-in-up-delay-3"
-  }, /*#__PURE__*/React.createElement("div", {
-    className: "flex items-center justify-between px-5 mb-3"
-  }, /*#__PURE__*/React.createElement("h2", {
-    className: "text-[17px] font-bold text-[#1d1d1f] tracking-[-0.01em]"
-  }, "Recaps"), /*#__PURE__*/React.createElement("svg", {
-    width: "10",
-    height: "16",
-    viewBox: "0 0 12 18",
-    fill: "none",
-    className: "opacity-50"
-  }, /*#__PURE__*/React.createElement("path", {
-    d: "M2 2l7 7-7 7",
-    stroke: "#1d1d1f",
-    strokeWidth: "2.5",
-    strokeLinecap: "round",
-    strokeLinejoin: "round"
-  }))), /*#__PURE__*/React.createElement("div", {
-    className: "flex gap-3 overflow-x-auto hide-scrollbar smooth-scroll px-5 pb-2"
-  }, /*#__PURE__*/React.createElement("button", {
-    className: "glass-card flex-shrink-0 w-[190px] h-[205px] rounded-[20px] p-4 flex flex-col card-press text-left"
-  }, /*#__PURE__*/React.createElement("span", {
-    className: "text-[11px] text-[#6e6e73] font-medium"
-  }, "Yesterday"), /*#__PURE__*/React.createElement("h3", {
-    className: "text-[17px] font-bold text-[#1d1d1f] mt-1.5 leading-tight"
-  }, "Diurnal", /*#__PURE__*/React.createElement("br", null), "Temperature", /*#__PURE__*/React.createElement("br", null), "Variation"), /*#__PURE__*/React.createElement("p", {
-    className: "text-[12px] text-[#6e6e73] mt-2.5 leading-[16px] line-clamp-4"
-  }, "Review related atmosphere concepts next, especially lapse rate, land and sea breezes, and how clouds and humidity...")), /*#__PURE__*/React.createElement("button", {
-    className: "glass-card flex-shrink-0 w-[190px] h-[205px] rounded-[20px] p-4 flex flex-col card-press text-left"
-  }, /*#__PURE__*/React.createElement("span", {
-    className: "text-[11px] text-[#6e6e73] font-medium"
-  }, "September 6"), /*#__PURE__*/React.createElement("h3", {
-    className: "text-[17px] font-bold text-[#1d1d1f] mt-1.5 leading-tight"
-  }, "Calendar event", /*#__PURE__*/React.createElement("br", null), "management"), /*#__PURE__*/React.createElement("p", {
-    className: "text-[12px] text-[#6e6e73] mt-2.5 leading-[16px] line-clamp-4"
-  }, "Next, you might want to add your recurring commitments with clearer titles or durations so your daily calendar views are more useful at a glan...")), /*#__PURE__*/React.createElement("button", {
-    className: "glass-card flex-shrink-0 w-[190px] h-[205px] rounded-[20px] p-4 flex flex-col card-press text-left"
-  }, /*#__PURE__*/React.createElement("span", {
-    className: "text-[11px] text-[#6e6e73] font-medium"
-  }, "September 4"), /*#__PURE__*/React.createElement("h3", {
-    className: "text-[17px] font-bold text-[#1d1d1f] mt-1.5 leading-tight"
-  }, "Earth & Space", /*#__PURE__*/React.createElement("br", null), "exploration"), /*#__PURE__*/React.createElement("div", {
-    className: "mt-2 rounded-[10px] overflow-hidden h-[80px]"
-  }, /*#__PURE__*/React.createElement(AstronomyIllustration, null)), /*#__PURE__*/React.createElement("p", {
-    className: "text-[12px] text-[#6e6e73] mt-1.5 leading-[16px] line-clamp-2"
-  }, "Explore orbital mechanics, planetary atmospheres, and celestial navigation..."))));
-}
-function TrySomethingNewSection() {
-  return /*#__PURE__*/React.createElement("div", {
-    className: "mt-6 pb-28 fade-bottom"
-  }, /*#__PURE__*/React.createElement("h2", {
-    className: "text-[17px] font-bold text-[#1d1d1f] px-5 mb-3 tracking-[-0.01em]"
-  }, "Try something new"), /*#__PURE__*/React.createElement("div", {
-    className: "flex gap-3 overflow-x-auto hide-scrollbar smooth-scroll px-5 pb-2"
-  }, /*#__PURE__*/React.createElement("button", {
-    className: "flex-shrink-0 w-[190px] h-[132px] rounded-[20px] overflow-hidden card-press relative"
-  }, /*#__PURE__*/React.createElement("div", {
-    className: "absolute inset-0"
-  }, /*#__PURE__*/React.createElement(OdysseyIllustration, null)), /*#__PURE__*/React.createElement("div", {
-    className: "absolute bottom-0 left-0 right-0 p-3 bg-gradient-to-t from-black/20 to-transparent"
-  }, /*#__PURE__*/React.createElement("p", {
-    className: "text-[13px] font-semibold text-[#1d1d1f]/80 leading-tight"
-  }, "Tell me the story of the Odyssey"))), /*#__PURE__*/React.createElement("button", {
-    className: "flex-shrink-0 w-[190px] h-[132px] rounded-[20px] overflow-hidden card-press relative bg-[#eee8dd]"
-  }, /*#__PURE__*/React.createElement("div", {
-    className: "absolute inset-0 flex items-center justify-center"
-  }, /*#__PURE__*/React.createElement("svg", {
-    viewBox: "0 0 200 120",
-    className: "w-full h-full p-5"
-  }, /*#__PURE__*/React.createElement("rect", {
-    width: "200",
-    height: "120",
-    rx: "12",
-    fill: "#e8e0d0"
-  }), /*#__PURE__*/React.createElement("circle", {
-    cx: "60",
-    cy: "50",
-    r: "20",
-    fill: "#f0c75e",
-    opacity: "0.5"
-  }), /*#__PURE__*/React.createElement("path", {
-    d: "M30 90 Q60 70 100 85 Q140 100 170 80",
-    stroke: "#7cb5d4",
-    strokeWidth: "2",
-    fill: "none",
-    opacity: "0.5"
-  }), /*#__PURE__*/React.createElement("rect", {
-    x: "110",
-    y: "30",
-    width: "50",
-    height: "60",
-    rx: "4",
-    fill: "white",
-    opacity: "0.7"
-  }), /*#__PURE__*/React.createElement("line", {
-    x1: "118",
-    y1: "42",
-    x2: "152",
-    y2: "42",
-    stroke: "#ccc",
-    strokeWidth: "2"
-  }), /*#__PURE__*/React.createElement("line", {
-    x1: "118",
-    y1: "50",
-    x2: "148",
-    y2: "50",
-    stroke: "#ccc",
-    strokeWidth: "2"
-  }), /*#__PURE__*/React.createElement("line", {
-    x1: "118",
-    y1: "58",
-    x2: "145",
-    y2: "58",
-    stroke: "#ccc",
-    strokeWidth: "2"
-  }))), /*#__PURE__*/React.createElement("div", {
-    className: "absolute bottom-0 left-0 right-0 p-3"
-  }, /*#__PURE__*/React.createElement("p", {
-    className: "text-[13px] font-semibold text-[#1d1d1f]/70 leading-tight"
-  }, "Summarize my recent notes"))), /*#__PURE__*/React.createElement("button", {
-    className: "flex-shrink-0 w-[190px] h-[132px] rounded-[20px] overflow-hidden card-press relative bg-[#eee8dd]"
-  }, /*#__PURE__*/React.createElement("div", {
-    className: "absolute inset-0 flex items-center justify-center"
-  }, /*#__PURE__*/React.createElement("svg", {
-    viewBox: "0 0 200 120",
-    className: "w-full h-full p-5"
-  }, /*#__PURE__*/React.createElement("rect", {
-    width: "200",
-    height: "120",
-    rx: "12",
-    fill: "#e5ddd0"
-  }), /*#__PURE__*/React.createElement("circle", {
-    cx: "100",
-    cy: "55",
-    r: "30",
-    fill: "none",
-    stroke: "#c4b5a0",
-    strokeWidth: "1.5"
-  }), /*#__PURE__*/React.createElement("circle", {
-    cx: "100",
-    cy: "55",
-    r: "20",
-    fill: "none",
-    stroke: "#c4b5a0",
-    strokeWidth: "1"
-  }), /*#__PURE__*/React.createElement("circle", {
-    cx: "100",
-    cy: "55",
-    r: "5",
-    fill: "#2d5a3a",
-    opacity: "0.4"
-  }), /*#__PURE__*/React.createElement("line", {
-    x1: "100",
-    y1: "25",
-    x2: "100",
-    y2: "35",
-    stroke: "#c4b5a0",
-    strokeWidth: "1"
-  }), /*#__PURE__*/React.createElement("line", {
-    x1: "100",
-    y1: "75",
-    x2: "100",
-    y2: "85",
-    stroke: "#c4b5a0",
-    strokeWidth: "1"
-  }), /*#__PURE__*/React.createElement("line", {
-    x1: "70",
-    y1: "55",
-    x2: "80",
-    y2: "55",
-    stroke: "#c4b5a0",
-    strokeWidth: "1"
-  }), /*#__PURE__*/React.createElement("line", {
-    x1: "120",
-    y1: "55",
-    x2: "130",
-    y2: "55",
-    stroke: "#c4b5a0",
-    strokeWidth: "1"
-  }))), /*#__PURE__*/React.createElement("div", {
-    className: "absolute bottom-0 left-0 right-0 p-3"
-  }, /*#__PURE__*/React.createElement("p", {
-    className: "text-[13px] font-semibold text-[#1d1d1f]/70 leading-tight"
-  }, "Create a study schedule")))));
-}
-function PromptBar({
-  onDismiss
-}) {
-  const inputRef = useRef(null);
-  const [value, setValue] = useState('');
-  useEffect(() => {
-    inputRef.current?.focus();
-  }, []);
-  const keepFocus = e => e.preventDefault();
-  const handleSend = () => {
-    if (!value.trim()) return;
-    setValue('');
-    inputRef.current?.blur();
-    onDismiss();
-  };
-  return /*#__PURE__*/React.createElement("div", {
-    className: "glass-card rounded-[26px] p-3.5 flex flex-col gap-3 animate-fade-in-up"
-  }, /*#__PURE__*/React.createElement("input", {
-    ref: inputRef,
-    type: "text",
-    value: value,
-    onChange: e => setValue(e.target.value),
-    onKeyDown: e => {
-      if (e.key === 'Enter') handleSend();
-      if (e.key === 'Escape') {
+    // ---------- Voice Button ----------
+    function VoiceButton() {
+      const [isActive, setIsActive] = useState(false);
+      const [isListening, setIsListening] = useState(false);
+      const timerRef = useRef();
+
+      const handlePress = () => {
+        setIsActive(true);
+        setIsListening(true);
+        timerRef.current = setTimeout(() => {
+          setIsListening(false);
+          setTimeout(() => setIsActive(false), 400);
+        }, 2000);
+      };
+
+      useEffect(() => {
+        return () => clearTimeout(timerRef.current);
+      }, []);
+
+      return (
+        <button
+          onClick={handlePress}
+          className={`relative flex items-center justify-center select-none touch-none transition-all duration-300 ${
+            isActive ? 'scale-110' : 'scale-100'
+          }`}
+          style={{
+            width: '103px',
+            height: '49px',
+            borderRadius: '25px',
+            background: isActive ? 'rgba(28,28,30,0.95)' : 'rgba(44,44,46,0.92)',
+            backdropFilter: 'blur(20px)',
+            WebkitBackdropFilter: 'blur(20px)',
+            border: '2px solid #ffffff',
+            boxShadow: isActive ? '0 0 0 4px rgba(255,255,255,0.2), 0 4px 24px rgba(0,0,0,0.35)' : '0 4px 16px rgba(0,0,0,0.2)'
+          }}
+        >
+          <svg width="25" height="25" viewBox="0 0 24 24" fill="none">
+            <rect x="9" y="2" width="6" height="12" rx="3" fill="white"/>
+            <path d="M5 11a7 7 0 0014 0" stroke="white" strokeWidth="2" strokeLinecap="round"/>
+            <line x1="12" y1="18" x2="12" y2="22" stroke="white" strokeWidth="2" strokeLinecap="round"/>
+            <line x1="8" y1="22" x2="16" y2="22" stroke="white" strokeWidth="2" strokeLinecap="round"/>
+          </svg>
+          
+          {isListening && (
+            <div className="absolute -top-12 left-1/2 -translate-x-1/2 flex gap-1">
+              {[12, 28, 18, 35, 22, 30, 15].map((h, i) => (
+                <div
+                  key={i}
+                  className="w-1 rounded-full bg-white/70"
+                  style={{
+                    height: '12px',
+                    animation: `wave 0.8s ease-in-out ${i * 0.1}s infinite alternate`
+                  }}
+                />
+              ))}
+            </div>
+          )}
+        </button>
+      );
+    }
+
+    // Add keyframe for wave animation
+    const style = document.createElement('style');
+    style.textContent = `
+      @keyframes wave {
+        0% { height: 12px; }
+        100% { height: 35px; }
+      }
+    `;
+    document.head.appendChild(style);
+
+    // ---------- Illustrations ----------
+    function PersonIcon() {
+      return (
+        <svg viewBox="0 0 110 110" className="w-full h-full">
+          <rect width="110" height="110" rx="16" fill="#f5f0e8"/>
+          <ellipse cx="55" cy="90" rx="28" ry="18" fill="#2d5a3a"/>
+          <rect x="49" y="55" width="12" height="14" rx="4" fill="#d4a574"/>
+          <circle cx="55" cy="45" r="18" fill="#d4a574"/>
+          <path d="M37 42c0-12 8-20 18-20s18 8 18 20c0 2-1 3-2 3-3-8-8-12-16-12s-13 4-16 12c-1 0-2-1-2-3z" fill="#2c2c2c"/>
+          <circle cx="49" cy="45" r="1.5" fill="#2c2c2c"/>
+          <circle cx="61" cy="45" r="1.5" fill="#2c2c2c"/>
+          <path d="M52 51c1.5 1.5 4.5 1.5 6 0" stroke="#2c2c2c" strokeWidth="1.2" strokeLinecap="round"/>
+          <text x="78" y="32" fontSize="22" fontWeight="bold" fill="#2d5a3a" opacity="0.7">?</text>
+        </svg>
+      );
+    }
+
+    function DocumentIcon() {
+      return (
+        <svg viewBox="0 0 110 110" className="w-full h-full">
+          <rect width="110" height="110" rx="16" fill="#f5f0e8"/>
+          <ellipse cx="45" cy="92" rx="24" ry="16" fill="#2d5a3a"/>
+          <rect x="40" y="58" width="10" height="12" rx="4" fill="#d4a574"/>
+          <circle cx="45" cy="48" r="16" fill="#d4a574"/>
+          <path d="M29 45c0-11 7-18 16-18s16 7 16 18c0 2-1 2-2 2-3-7-7-10-14-10s-11 3-14 10c-1 0-2 0-2-2z" fill="#2c2c2c"/>
+          <circle cx="40" cy="48" r="1.3" fill="#2c2c2c"/>
+          <circle cx="50" cy="48" r="1.3" fill="#2c2c2c"/>
+          <path d="M43 53c1 1 3 1 4 0" stroke="#2c2c2c" strokeWidth="1" strokeLinecap="round"/>
+          <rect x="65" y="35" width="30" height="40" rx="3" fill="white" stroke="#ddd" strokeWidth="1"/>
+          <line x1="70" y1="45" x2="90" y2="45" stroke="#ccc" strokeWidth="2" strokeLinecap="round"/>
+          <line x1="70" y1="51" x2="87" y2="51" stroke="#ccc" strokeWidth="2" strokeLinecap="round"/>
+          <line x1="70" y1="57" x2="85" y2="57" stroke="#ccc" strokeWidth="2" strokeLinecap="round"/>
+          <line x1="70" y1="63" x2="82" y2="63" stroke="#ccc" strokeWidth="2" strokeLinecap="round"/>
+        </svg>
+      );
+    }
+
+    function SpaceIcon() {
+      return (
+        <svg viewBox="0 0 275 160" className="w-full h-full">
+          <rect width="275" height="160" rx="16" fill="#eee8dd"/>
+          <path d="M0 100 Q40 90 80 100 Q120 110 160 100 Q200 90 240 100 Q260 105 275 100 L275 160 L0 160 Z" fill="#7cb5d4" opacity="0.4"/>
+          <path d="M0 110 Q40 100 80 110 Q120 120 160 110 Q200 100 240 110 Q260 115 275 110 L275 160 L0 160 Z" fill="#7cb5d4" opacity="0.3"/>
+          <path d="M100 85 L170 85 L160 100 L110 100 Z" fill="#8b6f47"/>
+          <rect x="133" y="50" width="3" height="35" fill="#6b5035"/>
+          <path d="M136 52 L165 75 L136 80 Z" fill="#f5f0e8" stroke="#d4c5b0" strokeWidth="0.5"/>
+          <circle cx="220" cy="40" r="18" fill="#f0c75e" opacity="0.6"/>
+        </svg>
+      );
+    }
+
+    // ---------- UI Components ----------
+    function TopNav() {
+      return (
+        <div className="flex items-center justify-between px-5 pt-3 pb-2">
+          <button className="glass w-14 h-14 rounded-full flex items-center justify-center press">
+            <svg width="20" height="14" viewBox="0 0 20 14">
+              <line x1="1" y1="1" x2="19" y2="1" stroke="#1d1d1f" strokeWidth="2" strokeLinecap="round"/>
+              <line x1="1" y1="7" x2="19" y2="7" stroke="#1d1d1f" strokeWidth="2" strokeLinecap="round"/>
+              <line x1="1" y1="13" x2="19" y2="13" stroke="#1d1d1f" strokeWidth="2" strokeLinecap="round"/>
+            </svg>
+          </button>
+          <button className="glass flex items-center gap-4 px-5 py-3.5 rounded-full press">
+            <svg width="20" height="22" viewBox="0 0 20 22">
+              <path d="M3 1h14a1 1 0 011 1v18.5l-8-5-8 5V2a1 1 0 011-1z" stroke="#1d1d1f" strokeWidth="1.8"/>
+            </svg>
+            <svg width="20" height="20" viewBox="0 0 20 20">
+              <rect x="1" y="3" width="18" height="16" rx="3" stroke="#1d1d1f" strokeWidth="1.8"/>
+              <line x1="1" y1="8" x2="19" y2="8" stroke="#1d1d1f" strokeWidth="1.8"/>
+              <line x1="6" y1="1" x2="6" y2="5" stroke="#1d1d1f" strokeWidth="1.8" strokeLinecap="round"/>
+              <line x1="14" y1="1" x2="14" y2="5" stroke="#1d1d1f" strokeWidth="1.8" strokeLinecap="round"/>
+            </svg>
+          </button>
+        </div>
+      );
+    }
+
+    function Greeting() {
+      return (
+        <div className="px-5 pt-4 pb-3 fade-up">
+          <h1 className="text-[24px] font-normal text-[#1d1d1f] tracking-[-0.02em]">
+            Good morning, <span className="font-bold">Arun.</span>
+          </h1>
+          <p className="text-[21px] text-[#1d1d1f] tracking-[-0.02em] mt-1">
+            🏋️ <span className="font-bold">workout</span> is at <span className="font-normal">4:25</span>
+          </p>
+          <p className="text-[21px] text-[#1d1d1f] tracking-[-0.02em]">PM today.</p>
+        </div>
+      );
+    }
+
+    function ActionButtons() {
+      return (
+        <div className="flex gap-3 px-5 mt-3 mb-6 fade-up-delay-1">
+          <button className="glass flex-1 h-12 rounded-[18px] flex items-center justify-center press">
+            <span className="text-[15px] font-semibold text-[#1d1d1f]">Plan today</span>
+          </button>
+          <button className="glass flex-1 h-12 rounded-[18px] flex items-center justify-center press">
+            <span className="text-[15px] font-semibold text-[#1d1d1f]">Prep study</span>
+          </button>
+        </div>
+      );
+    }
+
+    function JumpBack() {
+      return (
+        <div className="mt-5 fade-up-delay-2">
+          <h2 className="text-[17px] font-bold text-[#1d1d1f] px-5 mb-3">Jump back in</h2>
+          <div className="flex gap-3 overflow-x-auto hide-scrollbar smooth-scroll px-5 pb-2">
+            <button className="glass flex-shrink-0 w-[210px] h-[92px] rounded-[20px] flex items-center gap-3 p-3 card-press">
+              <div className="w-[68px] h-[68px] rounded-[14px] overflow-hidden flex-shrink-0">
+                <PersonIcon />
+              </div>
+              <span className="text-[15px] font-bold text-[#1d1d1f] leading-tight text-left">Ask anything</span>
+            </button>
+            <button className="glass flex-shrink-0 w-[210px] h-[92px] rounded-[20px] flex items-center gap-3 p-3 card-press">
+              <div className="w-[68px] h-[68px] rounded-[14px] overflow-hidden flex-shrink-0">
+                <DocumentIcon />
+              </div>
+              <span className="text-[15px] font-bold text-[#1d1d1f] leading-tight text-left">Ready to Form...</span>
+            </button>
+            <button className="glass flex-shrink-0 w-[210px] h-[92px] rounded-[20px] flex items-center gap-3 p-3 card-press">
+              <div className="w-[68px] h-[68px] rounded-[14px] bg-[#f5f0e8] flex items-center justify-center">
+                <div className="w-12 h-12 rounded-full bg-[#e8e0d0] flex items-center justify-center">
+                  <span className="text-2xl">✨</span>
+                </div>
+              </div>
+              <span className="text-[15px] font-bold text-[#1d1d1f] leading-tight text-left">Explore more</span>
+            </button>
+          </div>
+        </div>
+      );
+    }
+
+    function Recaps() {
+      return (
+        <div className="mt-6 fade-up-delay-3">
+          <div className="flex items-center justify-between px-5 mb-3">
+            <h2 className="text-[17px] font-bold text-[#1d1d1f]">Recaps</h2>
+            <svg width="10" height="16" viewBox="0 0 12 18" className="opacity-50">
+              <path d="M2 2l7 7-7 7" stroke="#1d1d1f" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
+            </svg>
+          </div>
+          <div className="flex gap-3 overflow-x-auto hide-scrollbar smooth-scroll px-5 pb-2">
+            <button className="glass flex-shrink-0 w-[190px] h-[205px] rounded-[20px] p-4 flex flex-col card-press text-left">
+              <span className="text-[11px] text-[#6e6e73] font-medium">Yesterday</span>
+              <h3 className="text-[17px] font-bold text-[#1d1d1f] mt-1.5 leading-tight">
+                Diurnal<br />Temperature<br />Variation
+              </h3>
+              <p className="text-[12px] text-[#6e6e73] mt-2.5 leading-[16px] line-clamp-4">
+                Review related atmosphere concepts next, especially lapse rate, land and sea breezes, and how clouds and humidity...
+              </p>
+            </button>
+            <button className="glass flex-shrink-0 w-[190px] h-[205px] rounded-[20px] p-4 flex flex-col card-press text-left">
+              <span className="text-[11px] text-[#6e6e73] font-medium">September 6</span>
+              <h3 className="text-[17px] font-bold text-[#1d1d1f] mt-1.5 leading-tight">
+                Calendar event<br />management
+              </h3>
+              <p className="text-[12px] text-[#6e6e73] mt-2.5 leading-[16px] line-clamp-4">
+                Next, you might want to add your recurring commitments with clearer titles or durations...
+              </p>
+            </button>
+            <button className="glass flex-shrink-0 w-[190px] h-[205px] rounded-[20px] p-4 flex flex-col card-press text-left">
+              <span className="text-[11px] text-[#6e6e73] font-medium">September 4</span>
+              <h3 className="text-[17px] font-bold text-[#1d1d1f] mt-1.5 leading-tight">
+                Earth & Space<br />exploration
+              </h3>
+              <div className="mt-2 rounded-[10px] overflow-hidden h-[80px]">
+                <SpaceIcon />
+              </div>
+              <p className="text-[12px] text-[#6e6e73] mt-1.5 leading-[16px] line-clamp-2">
+                Explore orbital mechanics, planetary atmospheres...
+              </p>
+            </button>
+          </div>
+        </div>
+      );
+    }
+
+    function TryNew() {
+      return (
+        <div className="mt-6 pb-28 fade-bottom">
+          <h2 className="text-[17px] font-bold text-[#1d1d1f] px-5 mb-3">Try something new</h2>
+          <div className="flex gap-3 overflow-x-auto hide-scrollbar smooth-scroll px-5 pb-2">
+            <button className="flex-shrink-0 w-[190px] h-[132px] rounded-[20px] overflow-hidden card-press relative bg-[#eee8dd]">
+              <div className="absolute inset-0 flex items-center justify-center text-5xl">🌊</div>
+              <div className="absolute bottom-0 left-0 right-0 p-3 bg-gradient-to-t from-black/20 to-transparent">
+                <p className="text-[13px] font-semibold text-[#1d1d1f]/80 leading-tight">Tell me the story of the Odyssey</p>
+              </div>
+            </button>
+            <button className="flex-shrink-0 w-[190px] h-[132px] rounded-[20px] overflow-hidden card-press relative bg-[#eee8dd]">
+              <div className="absolute inset-0 flex items-center justify-center text-5xl">📝</div>
+              <div className="absolute bottom-0 left-0 right-0 p-3">
+                <p className="text-[13px] font-semibold text-[#1d1d1f]/70 leading-tight">Summarize my recent notes</p>
+              </div>
+            </button>
+            <button className="flex-shrink-0 w-[190px] h-[132px] rounded-[20px] overflow-hidden card-press relative bg-[#eee8dd]">
+              <div className="absolute inset-0 flex items-center justify-center text-5xl">📚</div>
+              <div className="absolute bottom-0 left-0 right-0 p-3">
+                <p className="text-[13px] font-semibold text-[#1d1d1f]/70 leading-tight">Create a study schedule</p>
+              </div>
+            </button>
+          </div>
+        </div>
+      );
+    }
+
+    function PromptBar({ onDismiss }) {
+      const inputRef = useRef(null);
+      const [value, setValue] = useState('');
+
+      useEffect(() => {
+        inputRef.current?.focus();
+      }, []);
+
+      const handleSend = () => {
+        if (!value.trim()) return;
+        setValue('');
         inputRef.current?.blur();
         onDismiss();
-      }
-    },
-    onBlur: e => {
-      if (!e.relatedTarget || !e.relatedTarget.closest('.prompt-bar-controls')) onDismiss();
-    },
-    placeholder: "Type something",
-    className: "w-full bg-transparent outline-none border-none text-[17px] text-[#1d1d1f] placeholder-[#a3a3a8] px-1",
-    style: {
-      colorScheme: 'light'
-    }
-  }), /*#__PURE__*/React.createElement("div", {
-    className: "flex items-center justify-between prompt-bar-controls"
-  }, /*#__PURE__*/React.createElement("div", {
-    className: "flex items-center gap-2"
-  }, /*#__PURE__*/React.createElement("button", {
-    onMouseDown: keepFocus,
-    className: "w-9 h-9 rounded-full flex items-center justify-center press-effect"
-  }, /*#__PURE__*/React.createElement("svg", {
-    width: "21",
-    height: "21",
-    viewBox: "0 0 24 24",
-    fill: "none"
-  }, /*#__PURE__*/React.createElement("rect", {
-    x: "3",
-    y: "4",
-    width: "18",
-    height: "16",
-    rx: "4",
-    stroke: "#3c3c43",
-    strokeWidth: "1.6",
-    fill: "none"
-  }), /*#__PURE__*/React.createElement("circle", {
-    cx: "9",
-    cy: "10",
-    r: "2",
-    stroke: "#3c3c43",
-    strokeWidth: "1.6",
-    fill: "none"
-  }), /*#__PURE__*/React.createElement("path", {
-    d: "M4.5 17l5-5 3 3 4-5 6 7",
-    stroke: "#3c3c43",
-    strokeWidth: "1.6",
-    strokeLinecap: "round",
-    strokeLinejoin: "round",
-    fill: "none"
-  }))), /*#__PURE__*/React.createElement("button", {
-    onMouseDown: keepFocus,
-    className: "w-9 h-9 rounded-full flex items-center justify-center press-effect"
-  }, /*#__PURE__*/React.createElement("svg", {
-    width: "21",
-    height: "21",
-    viewBox: "0 0 24 24",
-    fill: "none"
-  }, /*#__PURE__*/React.createElement("path", {
-    d: "M8.5 6.5L9.7 4.5h4.6l1.2 2h3a1.8 1.8 0 011.8 1.8v9.4a1.8 1.8 0 01-1.8 1.8H5.7a1.8 1.8 0 01-1.8-1.8V8.3A1.8 1.8 0 015.7 6.5h2.8z",
-    stroke: "#3c3c43",
-    strokeWidth: "1.6",
-    strokeLinejoin: "round",
-    fill: "none"
-  }), /*#__PURE__*/React.createElement("circle", {
-    cx: "12",
-    cy: "13",
-    r: "3.6",
-    stroke: "#3c3c43",
-    strokeWidth: "1.6",
-    fill: "none"
-  }))), /*#__PURE__*/React.createElement("button", {
-    onMouseDown: keepFocus,
-    className: "w-9 h-9 rounded-full flex items-center justify-center press-effect"
-  }, /*#__PURE__*/React.createElement("svg", {
-    width: "21",
-    height: "21",
-    viewBox: "0 0 24 24",
-    fill: "none"
-  }, /*#__PURE__*/React.createElement("path", {
-    d: "M6 3.5h9l3 3v14a1 1 0 01-1 1H6a1 1 0 01-1-1v-16a1 1 0 011-1z",
-    stroke: "#3c3c43",
-    strokeWidth: "1.6",
-    strokeLinejoin: "round",
-    fill: "none"
-  }), /*#__PURE__*/React.createElement("path", {
-    d: "M15 3.5v3h3",
-    stroke: "#3c3c43",
-    strokeWidth: "1.6",
-    strokeLinejoin: "round",
-    fill: "none"
-  }), /*#__PURE__*/React.createElement("line", {
-    x1: "7.5",
-    y1: "12",
-    x2: "16.5",
-    y2: "12",
-    stroke: "#3c3c43",
-    strokeWidth: "1.6",
-    strokeLinecap: "round"
-  }), /*#__PURE__*/React.createElement("line", {
-    x1: "7.5",
-    y1: "15.5",
-    x2: "14",
-    y2: "15.5",
-    stroke: "#3c3c43",
-    strokeWidth: "1.6",
-    strokeLinecap: "round"
-  })))), /*#__PURE__*/React.createElement("button", {
-    onMouseDown: keepFocus,
-    onClick: handleSend,
-    disabled: !value.trim(),
-    className: "w-11 h-11 rounded-full flex items-center justify-center press-effect transition-colors duration-200",
-    style: {
-      background: value.trim() ? '#1d1d1f' : '#c7c7cc'
-    }
-  }, /*#__PURE__*/React.createElement("svg", {
-    width: "19",
-    height: "19",
-    viewBox: "0 0 24 24",
-    fill: "none"
-  }, /*#__PURE__*/React.createElement("path", {
-    d: "M12 19V5",
-    stroke: "white",
-    strokeWidth: "2.2",
-    strokeLinecap: "round"
-  }), /*#__PURE__*/React.createElement("path", {
-    d: "M6 11l6-6 6 6",
-    stroke: "white",
-    strokeWidth: "2.2",
-    strokeLinecap: "round",
-    strokeLinejoin: "round"
-  })))));
-}
-function BottomNav() {
-  const [keyboardOpen, setKeyboardOpen] = useState(false);
-  return /*#__PURE__*/React.createElement("div", {
-    className: "fixed bottom-0 left-0 right-0 z-50 safe-bottom"
-  }, /*#__PURE__*/React.createElement("div", {
-    className: "bottom-nav-fade"
-  }), /*#__PURE__*/React.createElement("div", {
-    className: "relative flex items-center justify-between px-5 pt-2"
-  }, keyboardOpen ? /*#__PURE__*/React.createElement("div", {
-    className: "w-full"
-  }, /*#__PURE__*/React.createElement(PromptBar, {
-    onDismiss: () => setKeyboardOpen(false)
-  })) : /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("button", {
-    className: "glass-button w-14 h-14 rounded-full flex items-center justify-center press-effect"
-  }, /*#__PURE__*/React.createElement("svg", {
-    width: "22",
-    height: "22",
-    viewBox: "0 0 24 24",
-    fill: "none"
-  }, /*#__PURE__*/React.createElement("line", {
-    x1: "12",
-    y1: "4",
-    x2: "12",
-    y2: "20",
-    stroke: "#1d1d1f",
-    strokeWidth: "2",
-    strokeLinecap: "round"
-  }), /*#__PURE__*/React.createElement("line", {
-    x1: "4",
-    y1: "12",
-    x2: "20",
-    y2: "12",
-    stroke: "#1d1d1f",
-    strokeWidth: "2",
-    strokeLinecap: "round"
-  }))), /*#__PURE__*/React.createElement(VoiceInteraction, null), /*#__PURE__*/React.createElement("button", {
-    onClick: () => setKeyboardOpen(true),
-    className: "glass-button w-14 h-14 rounded-full flex items-center justify-center press-effect"
-  }, /*#__PURE__*/React.createElement("svg", {
-    width: "20",
-    height: "20",
-    viewBox: "0 0 22 22",
-    fill: "none"
-  }, /*#__PURE__*/React.createElement("rect", {
-    x: "1",
-    y: "4",
-    width: "20",
-    height: "14",
-    rx: "3",
-    stroke: "#1d1d1f",
-    strokeWidth: "1.8",
-    fill: "none"
-  }), /*#__PURE__*/React.createElement("rect", {
-    x: "4",
-    y: "7.5",
-    width: "3",
-    height: "2.5",
-    rx: "0.5",
-    fill: "#1d1d1f"
-  }), /*#__PURE__*/React.createElement("rect", {
-    x: "9.5",
-    y: "7.5",
-    width: "3",
-    height: "2.5",
-    rx: "0.5",
-    fill: "#1d1d1f"
-  }), /*#__PURE__*/React.createElement("rect", {
-    x: "15",
-    y: "7.5",
-    width: "3",
-    height: "2.5",
-    rx: "0.5",
-    fill: "#1d1d1f"
-  }), /*#__PURE__*/React.createElement("rect", {
-    x: "4",
-    y: "12",
-    width: "3",
-    height: "2.5",
-    rx: "0.5",
-    fill: "#1d1d1f"
-  }), /*#__PURE__*/React.createElement("rect", {
-    x: "9.5",
-    y: "12",
-    width: "3",
-    height: "2.5",
-    rx: "0.5",
-    fill: "#1d1d1f"
-  }), /*#__PURE__*/React.createElement("rect", {
-    x: "15",
-    y: "12",
-    width: "3",
-    height: "2.5",
-    rx: "0.5",
-    fill: "#1d1d1f"
-  }))))));
-}
-function BackgroundGradients() {
-  return /*#__PURE__*/React.createElement("div", {
-    className: "fixed inset-0 pointer-events-none z-0"
-  }, /*#__PURE__*/React.createElement("div", {
-    className: "bg-gradient-blob",
-    style: {
-      width: '350px',
-      height: '350px',
-      bottom: '15%',
-      left: '-10%',
-      background: 'radial-gradient(circle, rgba(186,215,244,0.5) 0%, transparent 70%)'
-    }
-  }), /*#__PURE__*/React.createElement("div", {
-    className: "bg-gradient-blob",
-    style: {
-      width: '300px',
-      height: '300px',
-      top: '25%',
-      right: '-15%',
-      background: 'radial-gradient(circle, rgba(244,198,210,0.4) 0%, transparent 70%)'
-    }
-  }), /*#__PURE__*/React.createElement("div", {
-    className: "bg-gradient-blob",
-    style: {
-      width: '400px',
-      height: '400px',
-      bottom: '-5%',
-      left: '20%',
-      background: 'radial-gradient(circle, rgba(210,196,236,0.35) 0%, transparent 70%)'
-    }
-  }), /*#__PURE__*/React.createElement("div", {
-    className: "bg-gradient-blob",
-    style: {
-      width: '280px',
-      height: '280px',
-      top: '5%',
-      left: '30%',
-      background: 'radial-gradient(circle, rgba(255,236,210,0.3) 0%, transparent 70%)'
-    }
-  }));
-}
+      };
 
-// ---------- App ----------
-function App() {
-  return /*#__PURE__*/React.createElement("div", {
-    className: "w-full h-full relative overflow-hidden",
-    style: {
-      backgroundColor: '#f8f7f4'
+      return (
+        <div className="glass rounded-[26px] p-3.5 flex flex-col gap-3 fade-up">
+          <input
+            ref={inputRef}
+            type="text"
+            value={value}
+            onChange={e => setValue(e.target.value)}
+            onKeyDown={e => {
+              if (e.key === 'Enter') handleSend();
+              if (e.key === 'Escape') {
+                inputRef.current?.blur();
+                onDismiss();
+              }
+            }}
+            placeholder="Type something"
+            className="w-full bg-transparent outline-none border-none text-[17px] text-[#1d1d1f] placeholder-[#a3a3a8] px-1"
+          />
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <button className="w-9 h-9 rounded-full flex items-center justify-center press">
+                <svg width="21" height="21" viewBox="0 0 24 24">
+                  <rect x="3" y="4" width="18" height="16" rx="4" stroke="#3c3c43" strokeWidth="1.6"/>
+                  <circle cx="9" cy="10" r="2" stroke="#3c3c43" strokeWidth="1.6"/>
+                  <path d="M4.5 17l5-5 3 3 4-5 6 7" stroke="#3c3c43" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"/>
+                </svg>
+              </button>
+              <button className="w-9 h-9 rounded-full flex items-center justify-center press">
+                <svg width="21" height="21" viewBox="0 0 24 24">
+                  <path d="M8.5 6.5L9.7 4.5h4.6l1.2 2h3a1.8 1.8 0 011.8 1.8v9.4a1.8 1.8 0 01-1.8 1.8H5.7a1.8 1.8 0 01-1.8-1.8V8.3A1.8 1.8 0 015.7 6.5h2.8z" stroke="#3c3c43" strokeWidth="1.6" strokeLinejoin="round"/>
+                  <circle cx="12" cy="13" r="3.6" stroke="#3c3c43" strokeWidth="1.6"/>
+                </svg>
+              </button>
+              <button className="w-9 h-9 rounded-full flex items-center justify-center press">
+                <svg width="21" height="21" viewBox="0 0 24 24">
+                  <path d="M6 3.5h9l3 3v14a1 1 0 01-1 1H6a1 1 0 01-1-1v-16a1 1 0 011-1z" stroke="#3c3c43" strokeWidth="1.6" strokeLinejoin="round"/>
+                  <path d="M15 3.5v3h3" stroke="#3c3c43" strokeWidth="1.6" strokeLinejoin="round"/>
+                  <line x1="7.5" y1="12" x2="16.5" y2="12" stroke="#3c3c43" strokeWidth="1.6" strokeLinecap="round"/>
+                  <line x1="7.5" y1="15.5" x2="14" y2="15.5" stroke="#3c3c43" strokeWidth="1.6" strokeLinecap="round"/>
+                </svg>
+              </button>
+            </div>
+            <button
+              onClick={handleSend}
+              disabled={!value.trim()}
+              className="w-11 h-11 rounded-full flex items-center justify-center press transition-colors duration-200"
+              style={{
+                background: value.trim() ? '#1d1d1f' : '#c7c7cc'
+              }}
+            >
+              <svg width="19" height="19" viewBox="0 0 24 24">
+                <path d="M12 19V5" stroke="white" strokeWidth="2.2" strokeLinecap="round"/>
+                <path d="M6 11l6-6 6 6" stroke="white" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"/>
+              </svg>
+            </button>
+          </div>
+        </div>
+      );
     }
-  }, /*#__PURE__*/React.createElement(BackgroundGradients, null), /*#__PURE__*/React.createElement("div", {
-    className: "relative z-10 h-full overflow-y-auto hide-scrollbar smooth-scroll",
-  }, /*#__PURE__*/React.createElement(TopNav, null), /*#__PURE__*/React.createElement(GreetingSection, null), /*#__PURE__*/React.createElement(ActionButtons, null), /*#__PURE__*/React.createElement(JumpBackInSection, null), /*#__PURE__*/React.createElement(RecapsSection, null), /*#__PURE__*/React.createElement(TrySomethingNewSection, null)), /*#__PURE__*/React.createElement(BottomNav, null));
-}
 
-// mount
-const root = ReactDOM.createRoot(document.getElementById('root'));
-root.render(/*#__PURE__*/React.createElement(App, null));
-</script>
+    function BottomNav() {
+      const [showPrompt, setShowPrompt] = useState(false);
+
+      return (
+        <div className="fixed bottom-0 left-0 right-0 z-50">
+          <div className="relative flex items-center justify-between px-5 pt-2 pb-4 bg-[#f8f7f4]">
+            {showPrompt ? (
+              <div className="w-full">
+                <PromptBar onDismiss={() => setShowPrompt(false)} />
+              </div>
+            ) : (
+              <>
+                <button className="glass w-14 h-14 rounded-full flex items-center justify-center press">
+                  <svg width="22" height="22" viewBox="0 0 24 24">
+                    <line x1="12" y1="4" x2="12" y2="20" stroke="#1d1d1f" strokeWidth="2" strokeLinecap="round"/>
+                    <line x1="4" y1="12" x2="20" y2="12" stroke="#1d1d1f" strokeWidth="2" strokeLinecap="round"/>
+                  </svg>
+                </button>
+                
+                <VoiceButton />
+                
+                <button
+                  onClick={() => setShowPrompt(true)}
+                  className="glass w-14 h-14 rounded-full flex items-center justify-center press"
+                >
+                  <svg width="20" height="20" viewBox="0 0 22 22">
+                    <rect x="1" y="4" width="20" height="14" rx="3" stroke="#1d1d1f" strokeWidth="1.8"/>
+                    <rect x="4" y="7.5" width="3" height="2.5" rx="0.5" fill="#1d1d1f"/>
+                    <rect x="9.5" y="7.5" width="3" height="2.5" rx="0.5" fill="#1d1d1f"/>
+                    <rect x="15" y="7.5" width="3" height="2.5" rx="0.5" fill="#1d1d1f"/>
+                    <rect x="4" y="12" width="3" height="2.5" rx="0.5" fill="#1d1d1f"/>
+                    <rect x="9.5" y="12" width="3" height="2.5" rx="0.5" fill="#1d1d1f"/>
+                    <rect x="15" y="12" width="3" height="2.5" rx="0.5" fill="#1d1d1f"/>
+                  </svg>
+                </button>
+              </>
+            )}
+          </div>
+        </div>
+      );
+    }
+
+    function Background() {
+      return (
+        <div className="fixed inset-0 pointer-events-none z-0">
+          <div className="blob" style={{ width: 350, height: 350, bottom: '15%', left: '-10%', background: 'radial-gradient(circle, rgba(186,215,244,0.5) 0%, transparent 70%)' }} />
+          <div className="blob" style={{ width: 300, height: 300, top: '25%', right: '-15%', background: 'radial-gradient(circle, rgba(244,198,210,0.4) 0%, transparent 70%)' }} />
+          <div className="blob" style={{ width: 400, height: 400, bottom: '-5%', left: '20%', background: 'radial-gradient(circle, rgba(210,196,236,0.35) 0%, transparent 70%)' }} />
+        </div>
+      );
+    }
+
+    // ---------- App ----------
+    function App() {
+      return (
+        <div className="w-full h-full relative overflow-hidden bg-[#f8f7f4]">
+          <Background />
+          <div className="relative z-10 h-full overflow-y-auto hide-scrollbar smooth-scroll">
+            <TopNav />
+            <Greeting />
+            <ActionButtons />
+            <JumpBack />
+            <Recaps />
+            <TryNew />
+          </div>
+          <BottomNav />
+        </div>
+      );
+    }
+
+    // Mount
+    const root = ReactDOM.createRoot(document.getElementById('root'));
+    root.render(<App />);
+  </script>
 </body>
 </html>

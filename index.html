@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -28,6 +29,12 @@
       background: #f8f7f4;
       position: relative;
       overflow: hidden;
+      opacity: 0;
+      transition: opacity 0.5s ease;
+    }
+    
+    #root.show {
+      opacity: 1;
     }
     
     /* Splash Screen */
@@ -40,7 +47,7 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      background: #1a1a1a;
+      background: #ffffff;
       z-index: 9999;
       transition: opacity 0.6s ease-out;
     }
@@ -51,16 +58,17 @@
     }
     
     #splash h1 {
-      font-size: 42px;
-      font-weight: 700;
-      color: #ffffff;
-      letter-spacing: 2px;
+      font-size: 48px;
+      font-weight: 800;
+      color: #1a1a1a;
+      letter-spacing: 3px;
       animation: pulse 1s ease-in-out;
     }
     
     @keyframes pulse {
-      0% { transform: scale(0.8); opacity: 0; }
-      50% { transform: scale(1.1); opacity: 1; }
+      0% { transform: scale(0.7); opacity: 0; }
+      50% { transform: scale(1.15); opacity: 1; }
+      70% { transform: scale(0.95); }
       100% { transform: scale(1); opacity: 1; }
     }
     
@@ -142,6 +150,11 @@
       filter: blur(60px);
       pointer-events: none;
     }
+
+    @keyframes wave {
+      0% { height: 12px; }
+      100% { height: 35px; }
+    }
   </style>
 </head>
 <body>
@@ -157,11 +170,6 @@
   <script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.production.min.js"></script>
 
   <script>
-    // Hide splash after 1 second
-    setTimeout(() => {
-      document.getElementById('splash').classList.add('hide');
-    }, 1000);
-
     const { useState, useRef, useEffect, useCallback } = React;
 
     // ---------- Voice Button ----------
@@ -183,13 +191,12 @@
         return () => clearTimeout(timerRef.current);
       }, []);
 
-      return (
-        <button
-          onClick={handlePress}
-          className={`relative flex items-center justify-center select-none touch-none transition-all duration-300 ${
-            isActive ? 'scale-110' : 'scale-100'
-          }`}
-          style={{
+      return React.createElement(
+        'button',
+        {
+          onClick: handlePress,
+          className: `relative flex items-center justify-center select-none touch-none transition-all duration-300 ${isActive ? 'scale-110' : 'scale-100'}`,
+          style: {
             width: '103px',
             height: '49px',
             borderRadius: '25px',
@@ -198,247 +205,217 @@
             WebkitBackdropFilter: 'blur(20px)',
             border: '2px solid #ffffff',
             boxShadow: isActive ? '0 0 0 4px rgba(255,255,255,0.2), 0 4px 24px rgba(0,0,0,0.35)' : '0 4px 16px rgba(0,0,0,0.2)'
-          }}
-        >
-          <svg width="25" height="25" viewBox="0 0 24 24" fill="none">
-            <rect x="9" y="2" width="6" height="12" rx="3" fill="white"/>
-            <path d="M5 11a7 7 0 0014 0" stroke="white" strokeWidth="2" strokeLinecap="round"/>
-            <line x1="12" y1="18" x2="12" y2="22" stroke="white" strokeWidth="2" strokeLinecap="round"/>
-            <line x1="8" y1="22" x2="16" y2="22" stroke="white" strokeWidth="2" strokeLinecap="round"/>
-          </svg>
-          
-          {isListening && (
-            <div className="absolute -top-12 left-1/2 -translate-x-1/2 flex gap-1">
-              {[12, 28, 18, 35, 22, 30, 15].map((h, i) => (
-                <div
-                  key={i}
-                  className="w-1 rounded-full bg-white/70"
-                  style={{
-                    height: '12px',
-                    animation: `wave 0.8s ease-in-out ${i * 0.1}s infinite alternate`
-                  }}
-                />
-              ))}
-            </div>
-          )}
-        </button>
+          }
+        },
+        React.createElement('svg', { width: '25', height: '25', viewBox: '0 0 24 24', fill: 'none' },
+          React.createElement('rect', { x: '9', y: '2', width: '6', height: '12', rx: '3', fill: 'white' }),
+          React.createElement('path', { d: 'M5 11a7 7 0 0014 0', stroke: 'white', strokeWidth: '2', strokeLinecap: 'round' }),
+          React.createElement('line', { x1: '12', y1: '18', x2: '12', y2: '22', stroke: 'white', strokeWidth: '2', strokeLinecap: 'round' }),
+          React.createElement('line', { x1: '8', y1: '22', x2: '16', y2: '22', stroke: 'white', strokeWidth: '2', strokeLinecap: 'round' })
+        ),
+        isListening && React.createElement('div', {
+          className: 'absolute -top-12 left-1/2 -translate-x-1/2 flex gap-1'
+        },
+          [12, 28, 18, 35, 22, 30, 15].map((h, i) =>
+            React.createElement('div', {
+              key: i,
+              className: 'w-1 rounded-full bg-white/70',
+              style: {
+                height: '12px',
+                animation: `wave 0.8s ease-in-out ${i * 0.1}s infinite alternate`
+              }
+            })
+          )
+        )
       );
     }
 
-    // Add keyframe for wave animation
-    const style = document.createElement('style');
-    style.textContent = `
-      @keyframes wave {
-        0% { height: 12px; }
-        100% { height: 35px; }
-      }
-    `;
-    document.head.appendChild(style);
-
     // ---------- Illustrations ----------
     function PersonIcon() {
-      return (
-        <svg viewBox="0 0 110 110" className="w-full h-full">
-          <rect width="110" height="110" rx="16" fill="#f5f0e8"/>
-          <ellipse cx="55" cy="90" rx="28" ry="18" fill="#2d5a3a"/>
-          <rect x="49" y="55" width="12" height="14" rx="4" fill="#d4a574"/>
-          <circle cx="55" cy="45" r="18" fill="#d4a574"/>
-          <path d="M37 42c0-12 8-20 18-20s18 8 18 20c0 2-1 3-2 3-3-8-8-12-16-12s-13 4-16 12c-1 0-2-1-2-3z" fill="#2c2c2c"/>
-          <circle cx="49" cy="45" r="1.5" fill="#2c2c2c"/>
-          <circle cx="61" cy="45" r="1.5" fill="#2c2c2c"/>
-          <path d="M52 51c1.5 1.5 4.5 1.5 6 0" stroke="#2c2c2c" strokeWidth="1.2" strokeLinecap="round"/>
-          <text x="78" y="32" fontSize="22" fontWeight="bold" fill="#2d5a3a" opacity="0.7">?</text>
-        </svg>
+      return React.createElement('svg', { viewBox: '0 0 110 110', className: 'w-full h-full' },
+        React.createElement('rect', { width: '110', height: '110', rx: '16', fill: '#f5f0e8' }),
+        React.createElement('ellipse', { cx: '55', cy: '90', rx: '28', ry: '18', fill: '#2d5a3a' }),
+        React.createElement('rect', { x: '49', y: '55', width: '12', height: '14', rx: '4', fill: '#d4a574' }),
+        React.createElement('circle', { cx: '55', cy: '45', r: '18', fill: '#d4a574' }),
+        React.createElement('path', { d: 'M37 42c0-12 8-20 18-20s18 8 18 20c0 2-1 3-2 3-3-8-8-12-16-12s-13 4-16 12c-1 0-2-1-2-3z', fill: '#2c2c2c' }),
+        React.createElement('circle', { cx: '49', cy: '45', r: '1.5', fill: '#2c2c2c' }),
+        React.createElement('circle', { cx: '61', cy: '45', r: '1.5', fill: '#2c2c2c' }),
+        React.createElement('path', { d: 'M52 51c1.5 1.5 4.5 1.5 6 0', stroke: '#2c2c2c', strokeWidth: '1.2', strokeLinecap: 'round' }),
+        React.createElement('text', { x: '78', y: '32', fontSize: '22', fontWeight: 'bold', fill: '#2d5a3a', opacity: '0.7' }, '?')
       );
     }
 
     function DocumentIcon() {
-      return (
-        <svg viewBox="0 0 110 110" className="w-full h-full">
-          <rect width="110" height="110" rx="16" fill="#f5f0e8"/>
-          <ellipse cx="45" cy="92" rx="24" ry="16" fill="#2d5a3a"/>
-          <rect x="40" y="58" width="10" height="12" rx="4" fill="#d4a574"/>
-          <circle cx="45" cy="48" r="16" fill="#d4a574"/>
-          <path d="M29 45c0-11 7-18 16-18s16 7 16 18c0 2-1 2-2 2-3-7-7-10-14-10s-11 3-14 10c-1 0-2 0-2-2z" fill="#2c2c2c"/>
-          <circle cx="40" cy="48" r="1.3" fill="#2c2c2c"/>
-          <circle cx="50" cy="48" r="1.3" fill="#2c2c2c"/>
-          <path d="M43 53c1 1 3 1 4 0" stroke="#2c2c2c" strokeWidth="1" strokeLinecap="round"/>
-          <rect x="65" y="35" width="30" height="40" rx="3" fill="white" stroke="#ddd" strokeWidth="1"/>
-          <line x1="70" y1="45" x2="90" y2="45" stroke="#ccc" strokeWidth="2" strokeLinecap="round"/>
-          <line x1="70" y1="51" x2="87" y2="51" stroke="#ccc" strokeWidth="2" strokeLinecap="round"/>
-          <line x1="70" y1="57" x2="85" y2="57" stroke="#ccc" strokeWidth="2" strokeLinecap="round"/>
-          <line x1="70" y1="63" x2="82" y2="63" stroke="#ccc" strokeWidth="2" strokeLinecap="round"/>
-        </svg>
+      return React.createElement('svg', { viewBox: '0 0 110 110', className: 'w-full h-full' },
+        React.createElement('rect', { width: '110', height: '110', rx: '16', fill: '#f5f0e8' }),
+        React.createElement('ellipse', { cx: '45', cy: '92', rx: '24', ry: '16', fill: '#2d5a3a' }),
+        React.createElement('rect', { x: '40', y: '58', width: '10', height: '12', rx: '4', fill: '#d4a574' }),
+        React.createElement('circle', { cx: '45', cy: '48', r: '16', fill: '#d4a574' }),
+        React.createElement('path', { d: 'M29 45c0-11 7-18 16-18s16 7 16 18c0 2-1 2-2 2-3-7-7-10-14-10s-11 3-14 10c-1 0-2 0-2-2z', fill: '#2c2c2c' }),
+        React.createElement('circle', { cx: '40', cy: '48', r: '1.3', fill: '#2c2c2c' }),
+        React.createElement('circle', { cx: '50', cy: '48', r: '1.3', fill: '#2c2c2c' }),
+        React.createElement('path', { d: 'M43 53c1 1 3 1 4 0', stroke: '#2c2c2c', strokeWidth: '1', strokeLinecap: 'round' }),
+        React.createElement('rect', { x: '65', y: '35', width: '30', height: '40', rx: '3', fill: 'white', stroke: '#ddd', strokeWidth: '1' }),
+        React.createElement('line', { x1: '70', y1: '45', x2: '90', y2: '45', stroke: '#ccc', strokeWidth: '2', strokeLinecap: 'round' }),
+        React.createElement('line', { x1: '70', y1: '51', x2: '87', y2: '51', stroke: '#ccc', strokeWidth: '2', strokeLinecap: 'round' }),
+        React.createElement('line', { x1: '70', y1: '57', x2: '85', y2: '57', stroke: '#ccc', strokeWidth: '2', strokeLinecap: 'round' }),
+        React.createElement('line', { x1: '70', y1: '63', x2: '82', y2: '63', stroke: '#ccc', strokeWidth: '2', strokeLinecap: 'round' })
       );
     }
 
     function SpaceIcon() {
-      return (
-        <svg viewBox="0 0 275 160" className="w-full h-full">
-          <rect width="275" height="160" rx="16" fill="#eee8dd"/>
-          <path d="M0 100 Q40 90 80 100 Q120 110 160 100 Q200 90 240 100 Q260 105 275 100 L275 160 L0 160 Z" fill="#7cb5d4" opacity="0.4"/>
-          <path d="M0 110 Q40 100 80 110 Q120 120 160 110 Q200 100 240 110 Q260 115 275 110 L275 160 L0 160 Z" fill="#7cb5d4" opacity="0.3"/>
-          <path d="M100 85 L170 85 L160 100 L110 100 Z" fill="#8b6f47"/>
-          <rect x="133" y="50" width="3" height="35" fill="#6b5035"/>
-          <path d="M136 52 L165 75 L136 80 Z" fill="#f5f0e8" stroke="#d4c5b0" strokeWidth="0.5"/>
-          <circle cx="220" cy="40" r="18" fill="#f0c75e" opacity="0.6"/>
-        </svg>
+      return React.createElement('svg', { viewBox: '0 0 275 160', className: 'w-full h-full' },
+        React.createElement('rect', { width: '275', height: '160', rx: '16', fill: '#eee8dd' }),
+        React.createElement('path', { d: 'M0 100 Q40 90 80 100 Q120 110 160 100 Q200 90 240 100 Q260 105 275 100 L275 160 L0 160 Z', fill: '#7cb5d4', opacity: '0.4' }),
+        React.createElement('path', { d: 'M0 110 Q40 100 80 110 Q120 120 160 110 Q200 100 240 110 Q260 115 275 110 L275 160 L0 160 Z', fill: '#7cb5d4', opacity: '0.3' }),
+        React.createElement('path', { d: 'M100 85 L170 85 L160 100 L110 100 Z', fill: '#8b6f47' }),
+        React.createElement('rect', { x: '133', y: '50', width: '3', height: '35', fill: '#6b5035' }),
+        React.createElement('path', { d: 'M136 52 L165 75 L136 80 Z', fill: '#f5f0e8', stroke: '#d4c5b0', strokeWidth: '0.5' }),
+        React.createElement('circle', { cx: '220', cy: '40', r: '18', fill: '#f0c75e', opacity: '0.6' })
       );
     }
 
     // ---------- UI Components ----------
     function TopNav() {
-      return (
-        <div className="flex items-center justify-between px-5 pt-3 pb-2">
-          <button className="glass w-14 h-14 rounded-full flex items-center justify-center press">
-            <svg width="20" height="14" viewBox="0 0 20 14">
-              <line x1="1" y1="1" x2="19" y2="1" stroke="#1d1d1f" strokeWidth="2" strokeLinecap="round"/>
-              <line x1="1" y1="7" x2="19" y2="7" stroke="#1d1d1f" strokeWidth="2" strokeLinecap="round"/>
-              <line x1="1" y1="13" x2="19" y2="13" stroke="#1d1d1f" strokeWidth="2" strokeLinecap="round"/>
-            </svg>
-          </button>
-          <button className="glass flex items-center gap-4 px-5 py-3.5 rounded-full press">
-            <svg width="20" height="22" viewBox="0 0 20 22">
-              <path d="M3 1h14a1 1 0 011 1v18.5l-8-5-8 5V2a1 1 0 011-1z" stroke="#1d1d1f" strokeWidth="1.8"/>
-            </svg>
-            <svg width="20" height="20" viewBox="0 0 20 20">
-              <rect x="1" y="3" width="18" height="16" rx="3" stroke="#1d1d1f" strokeWidth="1.8"/>
-              <line x1="1" y1="8" x2="19" y2="8" stroke="#1d1d1f" strokeWidth="1.8"/>
-              <line x1="6" y1="1" x2="6" y2="5" stroke="#1d1d1f" strokeWidth="1.8" strokeLinecap="round"/>
-              <line x1="14" y1="1" x2="14" y2="5" stroke="#1d1d1f" strokeWidth="1.8" strokeLinecap="round"/>
-            </svg>
-          </button>
-        </div>
+      return React.createElement('div', { className: 'flex items-center justify-between px-5 pt-3 pb-2' },
+        React.createElement('button', { className: 'glass w-14 h-14 rounded-full flex items-center justify-center press' },
+          React.createElement('svg', { width: '20', height: '14', viewBox: '0 0 20 14' },
+            React.createElement('line', { x1: '1', y1: '1', x2: '19', y2: '1', stroke: '#1d1d1f', strokeWidth: '2', strokeLinecap: 'round' }),
+            React.createElement('line', { x1: '1', y1: '7', x2: '19', y2: '7', stroke: '#1d1d1f', strokeWidth: '2', strokeLinecap: 'round' }),
+            React.createElement('line', { x1: '1', y1: '13', x2: '19', y2: '13', stroke: '#1d1d1f', strokeWidth: '2', strokeLinecap: 'round' })
+          )
+        ),
+        React.createElement('button', { className: 'glass flex items-center gap-4 px-5 py-3.5 rounded-full press' },
+          React.createElement('svg', { width: '20', height: '22', viewBox: '0 0 20 22' },
+            React.createElement('path', { d: 'M3 1h14a1 1 0 011 1v18.5l-8-5-8 5V2a1 1 0 011-1z', stroke: '#1d1d1f', strokeWidth: '1.8' })
+          ),
+          React.createElement('svg', { width: '20', height: '20', viewBox: '0 0 20 20' },
+            React.createElement('rect', { x: '1', y: '3', width: '18', height: '16', rx: '3', stroke: '#1d1d1f', strokeWidth: '1.8' }),
+            React.createElement('line', { x1: '1', y1: '8', x2: '19', y2: '8', stroke: '#1d1d1f', strokeWidth: '1.8' }),
+            React.createElement('line', { x1: '6', y1: '1', x2: '6', y2: '5', stroke: '#1d1d1f', strokeWidth: '1.8', strokeLinecap: 'round' }),
+            React.createElement('line', { x1: '14', y1: '1', x2: '14', y2: '5', stroke: '#1d1d1f', strokeWidth: '1.8', strokeLinecap: 'round' })
+          )
+        )
       );
     }
 
     function Greeting() {
-      return (
-        <div className="px-5 pt-4 pb-3 fade-up">
-          <h1 className="text-[24px] font-normal text-[#1d1d1f] tracking-[-0.02em]">
-            Good morning, <span className="font-bold">Arun.</span>
-          </h1>
-          <p className="text-[21px] text-[#1d1d1f] tracking-[-0.02em] mt-1">
-            🏋️ <span className="font-bold">workout</span> is at <span className="font-normal">4:25</span>
-          </p>
-          <p className="text-[21px] text-[#1d1d1f] tracking-[-0.02em]">PM today.</p>
-        </div>
+      return React.createElement('div', { className: 'px-5 pt-4 pb-3 fade-up' },
+        React.createElement('h1', { className: 'text-[24px] font-normal text-[#1d1d1f] tracking-[-0.02em]' },
+          'Good morning, ', React.createElement('span', { className: 'font-bold' }, 'Arun.')
+        ),
+        React.createElement('p', { className: 'text-[21px] text-[#1d1d1f] tracking-[-0.02em] mt-1' },
+          '🏋️ ', React.createElement('span', { className: 'font-bold' }, 'workout'), ' is at ', React.createElement('span', { className: 'font-normal' }, '4:25')
+        ),
+        React.createElement('p', { className: 'text-[21px] text-[#1d1d1f] tracking-[-0.02em]' }, 'PM today.')
       );
     }
 
     function ActionButtons() {
-      return (
-        <div className="flex gap-3 px-5 mt-3 mb-6 fade-up-delay-1">
-          <button className="glass flex-1 h-12 rounded-[18px] flex items-center justify-center press">
-            <span className="text-[15px] font-semibold text-[#1d1d1f]">Plan today</span>
-          </button>
-          <button className="glass flex-1 h-12 rounded-[18px] flex items-center justify-center press">
-            <span className="text-[15px] font-semibold text-[#1d1d1f]">Prep study</span>
-          </button>
-        </div>
+      return React.createElement('div', { className: 'flex gap-3 px-5 mt-3 mb-6 fade-up-delay-1' },
+        React.createElement('button', { className: 'glass flex-1 h-12 rounded-[18px] flex items-center justify-center press' },
+          React.createElement('span', { className: 'text-[15px] font-semibold text-[#1d1d1f]' }, 'Plan today')
+        ),
+        React.createElement('button', { className: 'glass flex-1 h-12 rounded-[18px] flex items-center justify-center press' },
+          React.createElement('span', { className: 'text-[15px] font-semibold text-[#1d1d1f]' }, 'Prep study')
+        )
       );
     }
 
     function JumpBack() {
-      return (
-        <div className="mt-5 fade-up-delay-2">
-          <h2 className="text-[17px] font-bold text-[#1d1d1f] px-5 mb-3">Jump back in</h2>
-          <div className="flex gap-3 overflow-x-auto hide-scrollbar smooth-scroll px-5 pb-2">
-            <button className="glass flex-shrink-0 w-[210px] h-[92px] rounded-[20px] flex items-center gap-3 p-3 card-press">
-              <div className="w-[68px] h-[68px] rounded-[14px] overflow-hidden flex-shrink-0">
-                <PersonIcon />
-              </div>
-              <span className="text-[15px] font-bold text-[#1d1d1f] leading-tight text-left">Ask anything</span>
-            </button>
-            <button className="glass flex-shrink-0 w-[210px] h-[92px] rounded-[20px] flex items-center gap-3 p-3 card-press">
-              <div className="w-[68px] h-[68px] rounded-[14px] overflow-hidden flex-shrink-0">
-                <DocumentIcon />
-              </div>
-              <span className="text-[15px] font-bold text-[#1d1d1f] leading-tight text-left">Ready to Form...</span>
-            </button>
-            <button className="glass flex-shrink-0 w-[210px] h-[92px] rounded-[20px] flex items-center gap-3 p-3 card-press">
-              <div className="w-[68px] h-[68px] rounded-[14px] bg-[#f5f0e8] flex items-center justify-center">
-                <div className="w-12 h-12 rounded-full bg-[#e8e0d0] flex items-center justify-center">
-                  <span className="text-2xl">✨</span>
-                </div>
-              </div>
-              <span className="text-[15px] font-bold text-[#1d1d1f] leading-tight text-left">Explore more</span>
-            </button>
-          </div>
-        </div>
+      return React.createElement('div', { className: 'mt-5 fade-up-delay-2' },
+        React.createElement('h2', { className: 'text-[17px] font-bold text-[#1d1d1f] px-5 mb-3' }, 'Jump back in'),
+        React.createElement('div', { className: 'flex gap-3 overflow-x-auto hide-scrollbar smooth-scroll px-5 pb-2' },
+          React.createElement('button', { className: 'glass flex-shrink-0 w-[210px] h-[92px] rounded-[20px] flex items-center gap-3 p-3 card-press' },
+            React.createElement('div', { className: 'w-[68px] h-[68px] rounded-[14px] overflow-hidden flex-shrink-0' },
+              React.createElement(PersonIcon, null)
+            ),
+            React.createElement('span', { className: 'text-[15px] font-bold text-[#1d1d1f] leading-tight text-left' }, 'Ask anything')
+          ),
+          React.createElement('button', { className: 'glass flex-shrink-0 w-[210px] h-[92px] rounded-[20px] flex items-center gap-3 p-3 card-press' },
+            React.createElement('div', { className: 'w-[68px] h-[68px] rounded-[14px] overflow-hidden flex-shrink-0' },
+              React.createElement(DocumentIcon, null)
+            ),
+            React.createElement('span', { className: 'text-[15px] font-bold text-[#1d1d1f] leading-tight text-left' }, 'Ready to Form...')
+          ),
+          React.createElement('button', { className: 'glass flex-shrink-0 w-[210px] h-[92px] rounded-[20px] flex items-center gap-3 p-3 card-press' },
+            React.createElement('div', { className: 'w-[68px] h-[68px] rounded-[14px] bg-[#f5f0e8] flex items-center justify-center' },
+              React.createElement('div', { className: 'w-12 h-12 rounded-full bg-[#e8e0d0] flex items-center justify-center' },
+                React.createElement('span', { className: 'text-2xl' }, '✨')
+              )
+            ),
+            React.createElement('span', { className: 'text-[15px] font-bold text-[#1d1d1f] leading-tight text-left' }, 'Explore more')
+          )
+        )
       );
     }
 
     function Recaps() {
-      return (
-        <div className="mt-6 fade-up-delay-3">
-          <div className="flex items-center justify-between px-5 mb-3">
-            <h2 className="text-[17px] font-bold text-[#1d1d1f]">Recaps</h2>
-            <svg width="10" height="16" viewBox="0 0 12 18" className="opacity-50">
-              <path d="M2 2l7 7-7 7" stroke="#1d1d1f" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
-            </svg>
-          </div>
-          <div className="flex gap-3 overflow-x-auto hide-scrollbar smooth-scroll px-5 pb-2">
-            <button className="glass flex-shrink-0 w-[190px] h-[205px] rounded-[20px] p-4 flex flex-col card-press text-left">
-              <span className="text-[11px] text-[#6e6e73] font-medium">Yesterday</span>
-              <h3 className="text-[17px] font-bold text-[#1d1d1f] mt-1.5 leading-tight">
-                Diurnal<br />Temperature<br />Variation
-              </h3>
-              <p className="text-[12px] text-[#6e6e73] mt-2.5 leading-[16px] line-clamp-4">
-                Review related atmosphere concepts next, especially lapse rate, land and sea breezes, and how clouds and humidity...
-              </p>
-            </button>
-            <button className="glass flex-shrink-0 w-[190px] h-[205px] rounded-[20px] p-4 flex flex-col card-press text-left">
-              <span className="text-[11px] text-[#6e6e73] font-medium">September 6</span>
-              <h3 className="text-[17px] font-bold text-[#1d1d1f] mt-1.5 leading-tight">
-                Calendar event<br />management
-              </h3>
-              <p className="text-[12px] text-[#6e6e73] mt-2.5 leading-[16px] line-clamp-4">
-                Next, you might want to add your recurring commitments with clearer titles or durations...
-              </p>
-            </button>
-            <button className="glass flex-shrink-0 w-[190px] h-[205px] rounded-[20px] p-4 flex flex-col card-press text-left">
-              <span className="text-[11px] text-[#6e6e73] font-medium">September 4</span>
-              <h3 className="text-[17px] font-bold text-[#1d1d1f] mt-1.5 leading-tight">
-                Earth & Space<br />exploration
-              </h3>
-              <div className="mt-2 rounded-[10px] overflow-hidden h-[80px]">
-                <SpaceIcon />
-              </div>
-              <p className="text-[12px] text-[#6e6e73] mt-1.5 leading-[16px] line-clamp-2">
-                Explore orbital mechanics, planetary atmospheres...
-              </p>
-            </button>
-          </div>
-        </div>
+      return React.createElement('div', { className: 'mt-6 fade-up-delay-3' },
+        React.createElement('div', { className: 'flex items-center justify-between px-5 mb-3' },
+          React.createElement('h2', { className: 'text-[17px] font-bold text-[#1d1d1f]' }, 'Recaps'),
+          React.createElement('svg', { width: '10', height: '16', viewBox: '0 0 12 18', className: 'opacity-50' },
+            React.createElement('path', { d: 'M2 2l7 7-7 7', stroke: '#1d1d1f', strokeWidth: '2.5', strokeLinecap: 'round', strokeLinejoin: 'round' })
+          )
+        ),
+        React.createElement('div', { className: 'flex gap-3 overflow-x-auto hide-scrollbar smooth-scroll px-5 pb-2' },
+          React.createElement('button', { className: 'glass flex-shrink-0 w-[190px] h-[205px] rounded-[20px] p-4 flex flex-col card-press text-left' },
+            React.createElement('span', { className: 'text-[11px] text-[#6e6e73] font-medium' }, 'Yesterday'),
+            React.createElement('h3', { className: 'text-[17px] font-bold text-[#1d1d1f] mt-1.5 leading-tight' },
+              'Diurnal', React.createElement('br', null), 'Temperature', React.createElement('br', null), 'Variation'
+            ),
+            React.createElement('p', { className: 'text-[12px] text-[#6e6e73] mt-2.5 leading-[16px] line-clamp-4' },
+              'Review related atmosphere concepts next, especially lapse rate, land and sea breezes, and how clouds and humidity...'
+            )
+          ),
+          React.createElement('button', { className: 'glass flex-shrink-0 w-[190px] h-[205px] rounded-[20px] p-4 flex flex-col card-press text-left' },
+            React.createElement('span', { className: 'text-[11px] text-[#6e6e73] font-medium' }, 'September 6'),
+            React.createElement('h3', { className: 'text-[17px] font-bold text-[#1d1d1f] mt-1.5 leading-tight' },
+              'Calendar event', React.createElement('br', null), 'management'
+            ),
+            React.createElement('p', { className: 'text-[12px] text-[#6e6e73] mt-2.5 leading-[16px] line-clamp-4' },
+              'Next, you might want to add your recurring commitments with clearer titles or durations...'
+            )
+          ),
+          React.createElement('button', { className: 'glass flex-shrink-0 w-[190px] h-[205px] rounded-[20px] p-4 flex flex-col card-press text-left' },
+            React.createElement('span', { className: 'text-[11px] text-[#6e6e73] font-medium' }, 'September 4'),
+            React.createElement('h3', { className: 'text-[17px] font-bold text-[#1d1d1f] mt-1.5 leading-tight' },
+              'Earth & Space', React.createElement('br', null), 'exploration'
+            ),
+            React.createElement('div', { className: 'mt-2 rounded-[10px] overflow-hidden h-[80px]' },
+              React.createElement(SpaceIcon, null)
+            ),
+            React.createElement('p', { className: 'text-[12px] text-[#6e6e73] mt-1.5 leading-[16px] line-clamp-2' },
+              'Explore orbital mechanics, planetary atmospheres...'
+            )
+          )
+        )
       );
     }
 
     function TryNew() {
-      return (
-        <div className="mt-6 pb-28 fade-bottom">
-          <h2 className="text-[17px] font-bold text-[#1d1d1f] px-5 mb-3">Try something new</h2>
-          <div className="flex gap-3 overflow-x-auto hide-scrollbar smooth-scroll px-5 pb-2">
-            <button className="flex-shrink-0 w-[190px] h-[132px] rounded-[20px] overflow-hidden card-press relative bg-[#eee8dd]">
-              <div className="absolute inset-0 flex items-center justify-center text-5xl">🌊</div>
-              <div className="absolute bottom-0 left-0 right-0 p-3 bg-gradient-to-t from-black/20 to-transparent">
-                <p className="text-[13px] font-semibold text-[#1d1d1f]/80 leading-tight">Tell me the story of the Odyssey</p>
-              </div>
-            </button>
-            <button className="flex-shrink-0 w-[190px] h-[132px] rounded-[20px] overflow-hidden card-press relative bg-[#eee8dd]">
-              <div className="absolute inset-0 flex items-center justify-center text-5xl">📝</div>
-              <div className="absolute bottom-0 left-0 right-0 p-3">
-                <p className="text-[13px] font-semibold text-[#1d1d1f]/70 leading-tight">Summarize my recent notes</p>
-              </div>
-            </button>
-            <button className="flex-shrink-0 w-[190px] h-[132px] rounded-[20px] overflow-hidden card-press relative bg-[#eee8dd]">
-              <div className="absolute inset-0 flex items-center justify-center text-5xl">📚</div>
-              <div className="absolute bottom-0 left-0 right-0 p-3">
-                <p className="text-[13px] font-semibold text-[#1d1d1f]/70 leading-tight">Create a study schedule</p>
-              </div>
-            </button>
-          </div>
-        </div>
+      return React.createElement('div', { className: 'mt-6 pb-28 fade-bottom' },
+        React.createElement('h2', { className: 'text-[17px] font-bold text-[#1d1d1f] px-5 mb-3' }, 'Try something new'),
+        React.createElement('div', { className: 'flex gap-3 overflow-x-auto hide-scrollbar smooth-scroll px-5 pb-2' },
+          React.createElement('button', { className: 'flex-shrink-0 w-[190px] h-[132px] rounded-[20px] overflow-hidden card-press relative bg-[#eee8dd]' },
+            React.createElement('div', { className: 'absolute inset-0 flex items-center justify-center text-5xl' }, '🌊'),
+            React.createElement('div', { className: 'absolute bottom-0 left-0 right-0 p-3 bg-gradient-to-t from-black/20 to-transparent' },
+              React.createElement('p', { className: 'text-[13px] font-semibold text-[#1d1d1f]/80 leading-tight' }, 'Tell me the story of the Odyssey')
+            )
+          ),
+          React.createElement('button', { className: 'flex-shrink-0 w-[190px] h-[132px] rounded-[20px] overflow-hidden card-press relative bg-[#eee8dd]' },
+            React.createElement('div', { className: 'absolute inset-0 flex items-center justify-center text-5xl' }, '📝'),
+            React.createElement('div', { className: 'absolute bottom-0 left-0 right-0 p-3' },
+              React.createElement('p', { className: 'text-[13px] font-semibold text-[#1d1d1f]/70 leading-tight' }, 'Summarize my recent notes')
+            )
+          ),
+          React.createElement('button', { className: 'flex-shrink-0 w-[190px] h-[132px] rounded-[20px] overflow-hidden card-press relative bg-[#eee8dd]' },
+            React.createElement('div', { className: 'absolute inset-0 flex items-center justify-center text-5xl' }, '📚'),
+            React.createElement('div', { className: 'absolute bottom-0 left-0 right-0 p-3' },
+              React.createElement('p', { className: 'text-[13px] font-semibold text-[#1d1d1f]/70 leading-tight' }, 'Create a study schedule')
+            )
+          )
+        )
       );
     }
 
@@ -457,138 +434,132 @@
         onDismiss();
       };
 
-      return (
-        <div className="glass rounded-[26px] p-3.5 flex flex-col gap-3 fade-up">
-          <input
-            ref={inputRef}
-            type="text"
-            value={value}
-            onChange={e => setValue(e.target.value)}
-            onKeyDown={e => {
-              if (e.key === 'Enter') handleSend();
-              if (e.key === 'Escape') {
-                inputRef.current?.blur();
-                onDismiss();
-              }
-            }}
-            placeholder="Type something"
-            className="w-full bg-transparent outline-none border-none text-[17px] text-[#1d1d1f] placeholder-[#a3a3a8] px-1"
-          />
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <button className="w-9 h-9 rounded-full flex items-center justify-center press">
-                <svg width="21" height="21" viewBox="0 0 24 24">
-                  <rect x="3" y="4" width="18" height="16" rx="4" stroke="#3c3c43" strokeWidth="1.6"/>
-                  <circle cx="9" cy="10" r="2" stroke="#3c3c43" strokeWidth="1.6"/>
-                  <path d="M4.5 17l5-5 3 3 4-5 6 7" stroke="#3c3c43" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"/>
-                </svg>
-              </button>
-              <button className="w-9 h-9 rounded-full flex items-center justify-center press">
-                <svg width="21" height="21" viewBox="0 0 24 24">
-                  <path d="M8.5 6.5L9.7 4.5h4.6l1.2 2h3a1.8 1.8 0 011.8 1.8v9.4a1.8 1.8 0 01-1.8 1.8H5.7a1.8 1.8 0 01-1.8-1.8V8.3A1.8 1.8 0 015.7 6.5h2.8z" stroke="#3c3c43" strokeWidth="1.6" strokeLinejoin="round"/>
-                  <circle cx="12" cy="13" r="3.6" stroke="#3c3c43" strokeWidth="1.6"/>
-                </svg>
-              </button>
-              <button className="w-9 h-9 rounded-full flex items-center justify-center press">
-                <svg width="21" height="21" viewBox="0 0 24 24">
-                  <path d="M6 3.5h9l3 3v14a1 1 0 01-1 1H6a1 1 0 01-1-1v-16a1 1 0 011-1z" stroke="#3c3c43" strokeWidth="1.6" strokeLinejoin="round"/>
-                  <path d="M15 3.5v3h3" stroke="#3c3c43" strokeWidth="1.6" strokeLinejoin="round"/>
-                  <line x1="7.5" y1="12" x2="16.5" y2="12" stroke="#3c3c43" strokeWidth="1.6" strokeLinecap="round"/>
-                  <line x1="7.5" y1="15.5" x2="14" y2="15.5" stroke="#3c3c43" strokeWidth="1.6" strokeLinecap="round"/>
-                </svg>
-              </button>
-            </div>
-            <button
-              onClick={handleSend}
-              disabled={!value.trim()}
-              className="w-11 h-11 rounded-full flex items-center justify-center press transition-colors duration-200"
-              style={{
-                background: value.trim() ? '#1d1d1f' : '#c7c7cc'
-              }}
-            >
-              <svg width="19" height="19" viewBox="0 0 24 24">
-                <path d="M12 19V5" stroke="white" strokeWidth="2.2" strokeLinecap="round"/>
-                <path d="M6 11l6-6 6 6" stroke="white" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"/>
-              </svg>
-            </button>
-          </div>
-        </div>
+      return React.createElement('div', { className: 'glass rounded-[26px] p-3.5 flex flex-col gap-3 fade-up' },
+        React.createElement('input', {
+          ref: inputRef,
+          type: 'text',
+          value: value,
+          onChange: e => setValue(e.target.value),
+          onKeyDown: e => {
+            if (e.key === 'Enter') handleSend();
+            if (e.key === 'Escape') {
+              inputRef.current?.blur();
+              onDismiss();
+            }
+          },
+          placeholder: 'Type something',
+          className: 'w-full bg-transparent outline-none border-none text-[17px] text-[#1d1d1f] placeholder-[#a3a3a8] px-1'
+        }),
+        React.createElement('div', { className: 'flex items-center justify-between' },
+          React.createElement('div', { className: 'flex items-center gap-2' },
+            React.createElement('button', { className: 'w-9 h-9 rounded-full flex items-center justify-center press' },
+              React.createElement('svg', { width: '21', height: '21', viewBox: '0 0 24 24' },
+                React.createElement('rect', { x: '3', y: '4', width: '18', height: '16', rx: '4', stroke: '#3c3c43', strokeWidth: '1.6' }),
+                React.createElement('circle', { cx: '9', cy: '10', r: '2', stroke: '#3c3c43', strokeWidth: '1.6' }),
+                React.createElement('path', { d: 'M4.5 17l5-5 3 3 4-5 6 7', stroke: '#3c3c43', strokeWidth: '1.6', strokeLinecap: 'round', strokeLinejoin: 'round' })
+              )
+            ),
+            React.createElement('button', { className: 'w-9 h-9 rounded-full flex items-center justify-center press' },
+              React.createElement('svg', { width: '21', height: '21', viewBox: '0 0 24 24' },
+                React.createElement('path', { d: 'M8.5 6.5L9.7 4.5h4.6l1.2 2h3a1.8 1.8 0 011.8 1.8v9.4a1.8 1.8 0 01-1.8 1.8H5.7a1.8 1.8 0 01-1.8-1.8V8.3A1.8 1.8 0 015.7 6.5h2.8z', stroke: '#3c3c43', strokeWidth: '1.6', strokeLinejoin: 'round' }),
+                React.createElement('circle', { cx: '12', cy: '13', r: '3.6', stroke: '#3c3c43', strokeWidth: '1.6' })
+              )
+            ),
+            React.createElement('button', { className: 'w-9 h-9 rounded-full flex items-center justify-center press' },
+              React.createElement('svg', { width: '21', height: '21', viewBox: '0 0 24 24' },
+                React.createElement('path', { d: 'M6 3.5h9l3 3v14a1 1 0 01-1 1H6a1 1 0 01-1-1v-16a1 1 0 011-1z', stroke: '#3c3c43', strokeWidth: '1.6', strokeLinejoin: 'round' }),
+                React.createElement('path', { d: 'M15 3.5v3h3', stroke: '#3c3c43', strokeWidth: '1.6', strokeLinejoin: 'round' }),
+                React.createElement('line', { x1: '7.5', y1: '12', x2: '16.5', y2: '12', stroke: '#3c3c43', strokeWidth: '1.6', strokeLinecap: 'round' }),
+                React.createElement('line', { x1: '7.5', y1: '15.5', x2: '14', y2: '15.5', stroke: '#3c3c43', strokeWidth: '1.6', strokeLinecap: 'round' })
+              )
+            )
+          ),
+          React.createElement('button', {
+            onClick: handleSend,
+            disabled: !value.trim(),
+            className: 'w-11 h-11 rounded-full flex items-center justify-center press transition-colors duration-200',
+            style: {
+              background: value.trim() ? '#1d1d1f' : '#c7c7cc'
+            }
+          },
+            React.createElement('svg', { width: '19', height: '19', viewBox: '0 0 24 24' },
+              React.createElement('path', { d: 'M12 19V5', stroke: 'white', strokeWidth: '2.2', strokeLinecap: 'round' }),
+              React.createElement('path', { d: 'M6 11l6-6 6 6', stroke: 'white', strokeWidth: '2.2', strokeLinecap: 'round', strokeLinejoin: 'round' })
+            )
+          )
+        )
       );
     }
 
     function BottomNav() {
       const [showPrompt, setShowPrompt] = useState(false);
 
-      return (
-        <div className="fixed bottom-0 left-0 right-0 z-50">
-          <div className="relative flex items-center justify-between px-5 pt-2 pb-4 bg-[#f8f7f4]">
-            {showPrompt ? (
-              <div className="w-full">
-                <PromptBar onDismiss={() => setShowPrompt(false)} />
-              </div>
-            ) : (
-              <>
-                <button className="glass w-14 h-14 rounded-full flex items-center justify-center press">
-                  <svg width="22" height="22" viewBox="0 0 24 24">
-                    <line x1="12" y1="4" x2="12" y2="20" stroke="#1d1d1f" strokeWidth="2" strokeLinecap="round"/>
-                    <line x1="4" y1="12" x2="20" y2="12" stroke="#1d1d1f" strokeWidth="2" strokeLinecap="round"/>
-                  </svg>
-                </button>
-                
-                <VoiceButton />
-                
-                <button
-                  onClick={() => setShowPrompt(true)}
-                  className="glass w-14 h-14 rounded-full flex items-center justify-center press"
-                >
-                  <svg width="20" height="20" viewBox="0 0 22 22">
-                    <rect x="1" y="4" width="20" height="14" rx="3" stroke="#1d1d1f" strokeWidth="1.8"/>
-                    <rect x="4" y="7.5" width="3" height="2.5" rx="0.5" fill="#1d1d1f"/>
-                    <rect x="9.5" y="7.5" width="3" height="2.5" rx="0.5" fill="#1d1d1f"/>
-                    <rect x="15" y="7.5" width="3" height="2.5" rx="0.5" fill="#1d1d1f"/>
-                    <rect x="4" y="12" width="3" height="2.5" rx="0.5" fill="#1d1d1f"/>
-                    <rect x="9.5" y="12" width="3" height="2.5" rx="0.5" fill="#1d1d1f"/>
-                    <rect x="15" y="12" width="3" height="2.5" rx="0.5" fill="#1d1d1f"/>
-                  </svg>
-                </button>
-              </>
-            )}
-          </div>
-        </div>
+      return React.createElement('div', { className: 'fixed bottom-0 left-0 right-0 z-50' },
+        React.createElement('div', { className: 'relative flex items-center justify-between px-5 pt-2 pb-4 bg-[#f8f7f4]' },
+          showPrompt ?
+            React.createElement('div', { className: 'w-full' },
+              React.createElement(PromptBar, { onDismiss: () => setShowPrompt(false) })
+            ) :
+            React.createElement(React.Fragment, null,
+              React.createElement('button', { className: 'glass w-14 h-14 rounded-full flex items-center justify-center press' },
+                React.createElement('svg', { width: '22', height: '22', viewBox: '0 0 24 24' },
+                  React.createElement('line', { x1: '12', y1: '4', x2: '12', y2: '20', stroke: '#1d1d1f', strokeWidth: '2', strokeLinecap: 'round' }),
+                  React.createElement('line', { x1: '4', y1: '12', x2: '20', y2: '12', stroke: '#1d1d1f', strokeWidth: '2', strokeLinecap: 'round' })
+                )
+              ),
+              React.createElement(VoiceButton, null),
+              React.createElement('button', {
+                onClick: () => setShowPrompt(true),
+                className: 'glass w-14 h-14 rounded-full flex items-center justify-center press'
+              },
+                React.createElement('svg', { width: '20', height: '20', viewBox: '0 0 22 22' },
+                  React.createElement('rect', { x: '1', y: '4', width: '20', height: '14', rx: '3', stroke: '#1d1d1f', strokeWidth: '1.8' }),
+                  React.createElement('rect', { x: '4', y: '7.5', width: '3', height: '2.5', rx: '0.5', fill: '#1d1d1f' }),
+                  React.createElement('rect', { x: '9.5', y: '7.5', width: '3', height: '2.5', rx: '0.5', fill: '#1d1d1f' }),
+                  React.createElement('rect', { x: '15', y: '7.5', width: '3', height: '2.5', rx: '0.5', fill: '#1d1d1f' }),
+                  React.createElement('rect', { x: '4', y: '12', width: '3', height: '2.5', rx: '0.5', fill: '#1d1d1f' }),
+                  React.createElement('rect', { x: '9.5', y: '12', width: '3', height: '2.5', rx: '0.5', fill: '#1d1d1f' }),
+                  React.createElement('rect', { x: '15', y: '12', width: '3', height: '2.5', rx: '0.5', fill: '#1d1d1f' })
+                )
+              )
+            )
+        )
       );
     }
 
     function Background() {
-      return (
-        <div className="fixed inset-0 pointer-events-none z-0">
-          <div className="blob" style={{ width: 350, height: 350, bottom: '15%', left: '-10%', background: 'radial-gradient(circle, rgba(186,215,244,0.5) 0%, transparent 70%)' }} />
-          <div className="blob" style={{ width: 300, height: 300, top: '25%', right: '-15%', background: 'radial-gradient(circle, rgba(244,198,210,0.4) 0%, transparent 70%)' }} />
-          <div className="blob" style={{ width: 400, height: 400, bottom: '-5%', left: '20%', background: 'radial-gradient(circle, rgba(210,196,236,0.35) 0%, transparent 70%)' }} />
-        </div>
+      return React.createElement('div', { className: 'fixed inset-0 pointer-events-none z-0' },
+        React.createElement('div', { className: 'blob', style: { width: 350, height: 350, bottom: '15%', left: '-10%', background: 'radial-gradient(circle, rgba(186,215,244,0.5) 0%, transparent 70%)' } }),
+        React.createElement('div', { className: 'blob', style: { width: 300, height: 300, top: '25%', right: '-15%', background: 'radial-gradient(circle, rgba(244,198,210,0.4) 0%, transparent 70%)' } }),
+        React.createElement('div', { className: 'blob', style: { width: 400, height: 400, bottom: '-5%', left: '20%', background: 'radial-gradient(circle, rgba(210,196,236,0.35) 0%, transparent 70%)' } })
       );
     }
 
     // ---------- App ----------
     function App() {
-      return (
-        <div className="w-full h-full relative overflow-hidden bg-[#f8f7f4]">
-          <Background />
-          <div className="relative z-10 h-full overflow-y-auto hide-scrollbar smooth-scroll">
-            <TopNav />
-            <Greeting />
-            <ActionButtons />
-            <JumpBack />
-            <Recaps />
-            <TryNew />
-          </div>
-          <BottomNav />
-        </div>
+      return React.createElement('div', { className: 'w-full h-full relative overflow-hidden bg-[#f8f7f4]' },
+        React.createElement(Background, null),
+        React.createElement('div', { className: 'relative z-10 h-full overflow-y-auto hide-scrollbar smooth-scroll' },
+          React.createElement(TopNav, null),
+          React.createElement(Greeting, null),
+          React.createElement(ActionButtons, null),
+          React.createElement(JumpBack, null),
+          React.createElement(Recaps, null),
+          React.createElement(TryNew, null)
+        ),
+        React.createElement(BottomNav, null)
       );
     }
 
+    // Hide splash and show app after 1 second
+    setTimeout(() => {
+      document.getElementById('splash').classList.add('hide');
+      document.getElementById('root').classList.add('show');
+    }, 1000);
+
     // Mount
     const root = ReactDOM.createRoot(document.getElementById('root'));
-    root.render(<App />);
+    root.render(React.createElement(App, null));
   </script>
 </body>
 </html>

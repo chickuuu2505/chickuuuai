@@ -5,13 +5,10 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <meta name="theme-color" content="#f8f7f4" />
-  <!-- iOS "Add to Home Screen" PWA behavior: run standalone, and let our page
-       draw its own content underneath the status bar / Dynamic Island
-       (black-translucent) instead of iOS reserving an opaque bar there. -->
+  <!-- iOS Add to Home Screen PWA -->
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="mobile-web-app-capable" content="yes" />
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
   <meta name="apple-mobile-web-app-title" content="chickuuuai" />
   <title>chickuuuai</title>
   <!-- Tailwind (precompiled static build -- no runtime CDN dependency) -->
@@ -49,19 +46,6 @@
       overflow: hidden;
       background-color: #f8f7f4;
       position: relative;
-    }
-    /* Because the PWA's status bar is set to black-translucent, iOS lets our
-       own content draw underneath the Dynamic Island instead of reserving an
-       opaque bar there. This fills exactly that strip with the app's own
-       background color so it reads as one continuous surface rather than a
-       harder-edged white block sitting on top of the cream background. */
-    .ios-status-fill {
-      position: absolute;
-      top: 0; left: 0; right: 0;
-      height: env(safe-area-inset-top, 0px);
-      background: #f8f7f4;
-      z-index: 100;
-      pointer-events: none;
     }
     /* Desktop preview only: frame the phone-sized app against a neutral
        backdrop instead of the app's own cream color, so it visually reads as
@@ -1707,13 +1691,8 @@ function App() {
     style: {
       backgroundColor: '#f8f7f4'
     }
-  }, /*#__PURE__*/React.createElement("div", {
-    className: "ios-status-fill"
-  }), /*#__PURE__*/React.createElement(BackgroundGradients, null), /*#__PURE__*/React.createElement("div", {
+  }, /*#__PURE__*/React.createElement(BackgroundGradients, null), /*#__PURE__*/React.createElement("div", {
     className: "relative z-10 h-full overflow-y-auto hide-scrollbar smooth-scroll",
-    style: {
-      paddingTop: 'env(safe-area-inset-top, 0px)'
-    }
   }, /*#__PURE__*/React.createElement(TopNav, null), /*#__PURE__*/React.createElement(GreetingSection, null), /*#__PURE__*/React.createElement(ActionButtons, null), /*#__PURE__*/React.createElement(JumpBackInSection, null), /*#__PURE__*/React.createElement(RecapsSection, null), /*#__PURE__*/React.createElement(TrySomethingNewSection, null)), /*#__PURE__*/React.createElement(BottomNav, null));
 }
 

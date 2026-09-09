@@ -1,4 +1,5 @@
 
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -1668,7 +1669,32 @@ function BackgroundGradients() {
 }
 
 // ---------- App ----------
+function SplashScreen() {
+  return /*#__PURE__*/React.createElement("div", {
+    className: "fixed inset-0 z-[100] flex items-center justify-center",
+    style: {
+      backgroundColor: '#f8f7f4'
+    }
+  }, /*#__PURE__*/React.createElement("h1", {
+    style: {
+      fontSize: '32px',
+      fontWeight: 600,
+      letterSpacing: '-0.02em',
+      color: '#1d1d1f',
+      margin: 0
+    }
+  }, "Chickuuu Ai"));
+}
+
 function App() {
+  const [showSplash, setShowSplash] = useState(true);
+  useEffect(() => {
+    const t = setTimeout(() => setShowSplash(false), 1000);
+    return () => clearTimeout(t);
+  }, []);
+  if (showSplash) {
+    return /*#__PURE__*/React.createElement(SplashScreen, null);
+  }
   return /*#__PURE__*/React.createElement("div", {
     className: "w-full h-full relative overflow-hidden",
     style: {

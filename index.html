@@ -67,12 +67,22 @@
     }
     @media (min-width: 431px) {
       html, body { background-color: #dcdcde; }
-      body::before { display: none; }
+      body::before, body::after { display: none; }
       #root { box-shadow: 0 0 60px rgba(0,0,0,0.18); }
     }
     .safe-top { padding-top: env(safe-area-inset-top, 0px); }
-    /* ZERO bottom safe padding — was pushing icons up and creating thick bar */
+    /* ZERO extra class padding */
     .safe-bottom { padding-bottom: 0; }
+    /* Cover home-indicator strip with app cream so iOS never paints white there */
+    body::after {
+      content: '';
+      position: fixed;
+      bottom: 0; left: 0; right: 0;
+      height: max(env(safe-area-inset-bottom, 0px), 0px);
+      background: #f8f7f4;
+      z-index: 99997;
+      pointer-events: none;
+    }
 
     /* ---- Liquid Glass material ----
        Functional-layer glass: real-time blur + saturation lift (mimics refraction of
@@ -1538,11 +1548,14 @@ function BottomNav() {
   const [keyboardOpen, setKeyboardOpen] = useState(false);
   return /*#__PURE__*/React.createElement("div", {
     className: "fixed bottom-0 left-0 right-0 z-50",
-    style: { paddingBottom: 0, backgroundColor: "transparent" }
+    style: {
+      backgroundColor: "#f8f7f4",
+      paddingBottom: "env(safe-area-inset-bottom, 0px)"
+    }
   }, /*#__PURE__*/React.createElement("div", {
     className: "bottom-nav-fade"
   }), /*#__PURE__*/React.createElement("div", {
-    className: "relative flex items-center justify-between px-5 pb-1 pt-2"
+    className: "relative flex items-center justify-between px-5 pb-2 pt-2"
   }, keyboardOpen ? /*#__PURE__*/React.createElement("div", {
     className: "w-full"
   }, /*#__PURE__*/React.createElement(PromptBar, {

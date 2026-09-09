@@ -550,18 +550,18 @@ function VoiceInteraction() {
   const startExpansion = useCallback(() => {
     setPhase('expanding');
     spawnParticles();
-    // reach listening state after the 1s expand animation finishes
+    // reach listening state after the 0.5s expand animation finishes
     breatheTimerRef.current = setTimeout(() => {
       setPhase('listening');
-    }, 1000);
+    }, 500);
   }, [spawnParticles]);
   const startCollapse = useCallback(() => {
     setPhase('collapsing');
     if (breatheTimerRef.current) clearTimeout(breatheTimerRef.current);
-    // collapse finishes in 0.6s
+    // collapse finishes in 0.5s
     setTimeout(() => {
       setPhase('idle');
-    }, 600);
+    }, 500);
   }, []);
   const handlePressStart = e => {
     e.preventDefault();
@@ -615,8 +615,8 @@ function VoiceInteraction() {
       WebkitMaskImage: 'linear-gradient(to top, #000 0%, #000 55%, rgba(0,0,0,0.6) 75%, rgba(0,0,0,0.25) 88%, transparent 100%)',
       maskImage: 'linear-gradient(to top, #000 0%, #000 55%, rgba(0,0,0,0.6) 75%, rgba(0,0,0,0.25) 88%, transparent 100%)',
       willChange: 'height, opacity, transform',
-      // expand ≤ 1s, collapse 0.6s
-      transition: isCollapsing ? 'height 0.6s cubic-bezier(0.4,0,0.2,1), border-radius 0.6s cubic-bezier(0.4,0,0.2,1), opacity 0.6s cubic-bezier(0.4,0,0.2,1)' : 'height 1s cubic-bezier(0.25,0.1,0.25,1), border-radius 1s cubic-bezier(0.25,0.1,0.25,1), opacity 1s cubic-bezier(0.25,0.1,0.25,1)',
+      // expand 0.5s, collapse 0.5s
+      transition: isCollapsing ? 'height 0.5s cubic-bezier(0.4,0,0.2,1), border-radius 0.5s cubic-bezier(0.4,0,0.2,1), opacity 0.5s cubic-bezier(0.4,0,0.2,1)' : 'height 0.5s cubic-bezier(0.25,0.1,0.25,1), border-radius 0.5s cubic-bezier(0.25,0.1,0.25,1), opacity 0.5s cubic-bezier(0.25,0.1,0.25,1)',
       opacity: isExpanded || isCollapsing ? 1 : 0,
       animation: isListening ? 'breathe 2.5s ease-in-out infinite' : 'none'
     }
@@ -636,7 +636,7 @@ function VoiceInteraction() {
       WebkitMaskImage: 'linear-gradient(to top, #000 0%, #000 50%, rgba(0,0,0,0.5) 72%, rgba(0,0,0,0.15) 88%, transparent 100%)',
       maskImage: 'linear-gradient(to top, #000 0%, #000 50%, rgba(0,0,0,0.5) 72%, rgba(0,0,0,0.15) 88%, transparent 100%)',
       willChange: 'height, opacity, transform',
-      transition: isCollapsing ? 'height 0.6s cubic-bezier(0.4,0,0.2,1) 0.02s, opacity 0.6s cubic-bezier(0.4,0,0.2,1) 0.02s' : 'height 1s cubic-bezier(0.25,0.1,0.25,1) 0.04s, opacity 1s cubic-bezier(0.25,0.1,0.25,1) 0.04s',
+      transition: isCollapsing ? 'height 0.5s cubic-bezier(0.4,0,0.2,1) 0.02s, opacity 0.5s cubic-bezier(0.4,0,0.2,1) 0.02s' : 'height 0.5s cubic-bezier(0.25,0.1,0.25,1) 0.04s, opacity 0.5s cubic-bezier(0.25,0.1,0.25,1) 0.04s',
       opacity: isExpanded || isCollapsing ? 1 : 0,
       animation: isListening ? 'breathe2 2.5s ease-in-out infinite 0.1s' : 'none'
     }
@@ -651,38 +651,18 @@ function VoiceInteraction() {
       background: 'rgba(255,255,255,0.6)',
       boxShadow: '0 0 12px rgba(255,255,255,0.4)',
       pointerEvents: 'none',
-      bottom: '56px',
+      bottom: '52px',
       left: '50%',
       animation: `rise 1.35s cubic-bezier(0.16,1,0.3,1) ${p.delay}s forwards`,
       ['--x']: `${p.x}px`
     }
-  })), (isListening || isCollapsing) && /*#__PURE__*/React.createElement("div", {
-    style: {
-      position: 'absolute',
-      top: '35%',
-      left: '50%',
-      transform: 'translateX(-50%)',
-      display: 'flex',
-      alignItems: 'center',
-      gap: '6px',
-      animation: isListening ? 'fadeIn 0.4s ease forwards' : 'fadeOut 0.3s ease forwards'
-    }
-  }, [12, 28, 18, 35, 22, 30, 15].map((maxH, i) => /*#__PURE__*/React.createElement("div", {
-    key: i,
-    style: {
-      width: '3px',
-      borderRadius: '999px',
-      background: 'rgba(255,255,255,0.7)',
-      animation: `waveBar 0.8s ease-in-out ${i * 0.1}s infinite alternate`,
-      height: '12px'
-    }
-  })))), /*#__PURE__*/React.createElement("button", {
+  }))), /*#__PURE__*/React.createElement("button", {
     className: "relative z-50 flex items-center justify-center select-none touch-none",
     style: {
-      // ~10% larger than previous 70×30 pill
-      width: '77px',
-      height: '33px',
-      borderRadius: '16.5px',
+      // pill shape, overall +15%
+      width: '89px',
+      height: '41px',
+      borderRadius: '20.5px',
       background: isPressing ? 'rgba(28,28,30,0.95)' : 'rgba(44,44,46,0.92)',
       backdropFilter: 'blur(20px) saturate(150%)',
       WebkitBackdropFilter: 'blur(20px) saturate(150%)',
@@ -697,8 +677,8 @@ function VoiceInteraction() {
     onPointerLeave: handlePressEnd,
     onPointerCancel: handlePressEnd
   }, /*#__PURE__*/React.createElement("svg", {
-    width: "20",
-    height: "20",
+    width: "23",
+    height: "23",
     viewBox: "0 0 24 24",
     fill: "none",
     style: {
